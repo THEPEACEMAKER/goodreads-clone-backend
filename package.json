@@ -1,0 +1,36 @@
+{
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^7.0.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.37.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "nodemon": "^2.0.22"
+  },
+  "name": "goodreads-website",
+  "version": "1.0.0",
+  "description": "A website for reviewing books, rating, scheduing books reading and discussion about books.",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/THEPEACEMAKER/goodreads-clone-backend.git"
+  },
+  "keywords": [
+    "goodreads",
+    "nodejs",
+    "backend"
+  ],
+  "author": "ITI Team 2",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/THEPEACEMAKER/goodreads-clone-backend/issues"
+  },
+  "homepage": "https://github.com/THEPEACEMAKER/goodreads-clone-backend#readme"
+}
