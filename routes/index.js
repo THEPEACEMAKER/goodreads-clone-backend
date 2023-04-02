@@ -8,5 +8,6 @@ const authorsRoutes = require('./authors');
 
 const router = express.Router();
 router.use('/user', authRoutes);
+router.use('/categories', categoriesRoutes);
 
 module.exports = router;
