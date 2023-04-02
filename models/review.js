@@ -2,33 +2,35 @@
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
-const reviewSchema = new Schema({
+const reviewSchema = new Schema(
+  {
     title: {
-        typeof: 'string',
-        minLnegth: 3,
-        required: true
+      typeof: 'string',
+      minLnegth: 3,
+      required: true,
     },
     content: {
-        typeof: 'string',
-        minLnegth: 3,
-        required: true
+      typeof: 'string',
+      minLnegth: 3,
+      required: true,
     },
     rating: {
-        typeof: 'number',
+      typeof: 'number',
     },
     user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
     book: {
-        type: Schema.Types.ObjectId,
-        ref: 'Book',
-        required: true
-    }
-},
-{
-    timestamps: true
-});
+      type: Schema.Types.ObjectId,
+      ref: 'Book',
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 module.exports = mongoose.model('Review', reviewSchema);

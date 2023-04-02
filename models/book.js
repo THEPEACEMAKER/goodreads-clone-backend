@@ -2,35 +2,41 @@
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
-const bookSchema = new Schema({
+const bookSchema = new Schema(
+  {
     name: {
-        type: String,
-        minLength: 3,
-        required: true
+      type: String,
+      minLength: 3,
+      required: true,
     },
     imageUrl: {
-        type: string
+      type: string,
     },
-    category: [{
+    category: [
+      {
         type: Schema.Types.ObjectId,
         ref: 'Category',
-        required: true
-    }],
-    author: [{
+        required: true,
+      },
+    ],
+    author: [
+      {
         type: Schema.Types.ObjectId,
         ref: 'Author',
-        required: true
-    }],
+        required: true,
+      },
+    ],
     avgRating: {
-        type: Number,
+      type: Number,
     },
     reviews: {
-        type: Schema.Types.ObjectId,
-        ref: 'Review',
-    }
-},
-{
-    timestamps: true   
-});
+      type: Schema.Types.ObjectId,
+      ref: 'Review',
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 module.exports = mongoose.model('Book', bookSchema);

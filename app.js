@@ -1,8 +1,9 @@
-/* eslint-disable linebreak-style */
 const express = require('express');
-// eslint-disable-next-line no-unused-vars
 const dotenv = require('dotenv').config();
 const mongoose = require('mongoose');
+const multer = require('multer');
+const path = require('path');
+const isAuth = require('./middlewares/isAuth');
 
 const notFound = require('./middlewares/notFound');
 const errorHandler = require('./middlewares/errorHandler');
@@ -10,16 +11,40 @@ const routes = require('./routes');
 
 const app = express();
 
-app.use(express.json());
-app.get('/', (req, res) => {
-    res.send('Hello World!');
+const fileStorage = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, path.join(__dirname, 'images'));
+  },
+  filename(req, file, cb) {
+    cb(null, 'user - ' + new Date().toISOString().replace(/:/g, '-') + '-' + file.originalname);
+  },
 });
-app.use(routes);
-app.use(errorHandler);
-app.use('*', notFound);
 
-const { env: { PORT, MONGO_URL } } = process;
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === 'image/jpeg' ||
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/jpg'
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+app.get('/trial', isAuth, (req, res, next) => {
+  res.json('trial')
+});
+app.use(multer({ storage: fileStorage, fileFilter }).single('image'));
+app.use(express.json());
+app.use(routes);
+app.use('*', notFound);
+app.use(errorHandler);
+
+const {
+  env: { PORT, MONGO_URL },
+} = process;
 mongoose.connect(MONGO_URL);
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

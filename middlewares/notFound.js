@@ -1,4 +1,3 @@
-/* eslint-disable linebreak-style */
 module.exports = (req, res) => {
-    res.status(404).json({ message: 'Not Found' });
+  res.status(404).json({ message: 'Not Found' });
 };
