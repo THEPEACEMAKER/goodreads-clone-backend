@@ -52,7 +52,7 @@ exports.login = async (req, res, next) => {
 
 exports.signup = async (req, res, next) => {
   const {
-    body: { firstName, lastName, email, password },
+    body: { firstName, lastName, email, password, role },
   } = req;
 
   if (!req.file) {
@@ -76,6 +76,7 @@ exports.signup = async (req, res, next) => {
     lastName,
     email,
     imageUrl,
+    role,
     password: hashedPasswordData,
   });
 
