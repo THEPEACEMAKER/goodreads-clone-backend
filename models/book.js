@@ -10,7 +10,7 @@ const bookSchema = new Schema(
       required: true,
     },
     imageUrl: {
-      type: string,
+      type: String,
     },
     category: [
       {

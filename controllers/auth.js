@@ -47,9 +47,7 @@ exports.login = async (req, res, next) => {
     }
   );
 
-  res
-    .status(200)
-    .json({ message: 'Login Successfully!', token: token, userId: userData._id.toString() });
+  res.status(200).json({ message: 'Login Successfully!', token: token, user: userData });
 };
 
 exports.signup = async (req, res, next) => {
@@ -60,7 +58,7 @@ exports.signup = async (req, res, next) => {
   if (!req.file) {
     const error = new Error('No image file provided');
     error.statusCode = 422;
-    throw error;
+    return next(error);
   }
   const imageUrl = req.file.path;
 

@@ -4,12 +4,12 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const authorSchema = new Schema({
   firstName: {
-    type: string,
+    type: String,
     minLength: 3,
     required: true,
   },
   lastName: {
-    type: string,
+    type: String,
     minLength: 3,
     required: true,
   },
@@ -18,7 +18,7 @@ const authorSchema = new Schema({
     required: true,
   },
   imageUrl: {
-    type: string,
+    type: String,
   },
 });
 

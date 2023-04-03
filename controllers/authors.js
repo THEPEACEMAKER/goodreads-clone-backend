@@ -1,0 +1,109 @@
+const Author = require('../models/author');
+const asyncWrapper = require('../utils/asyncWrapper');
+const clearImage = require('../utils/clearImage');
+
+exports.add = async (req, res, next) => {
+  const {
+    body: { firstName, lastName, dob },
+  } = req;
+  if (!req.file) {
+    const error = new Error('No image file provided');
+    error.statusCode = 422;
+    return next(error);
+  }
+  const imageUrl = req.file.path;
+
+  const author = new Author({
+    firstName,
+    lastName,
+    dob,
+    imageUrl,
+  });
+
+  const [authorErr, authorData] = await asyncWrapper(author.save());
+  if (authorErr) {
+    if (!authorErr.statusCode) {
+      authorErr.statusCode = 500;
+    }
+    return next(authorErr);
+  }
+  res.status(201).json({ message: 'Author Created Successfully!', authorId: authorData._id });
+};
+
+exports.delete = async (req, res, next) => {
+  const {
+    params: { authorId },
+  } = req;
+  const author = Author.findOneAndDelete({ _id: authorId });
+  const [authorErr, authorData] = await asyncWrapper(author);
+  if (authorErr) {
+    if (!authorErr.statusCode) {
+      authorErr.statusCode = 500;
+    }
+    return next(authorErr);
+  }
+  if (!authorData) {
+    const error = new Error('Category Not Found');
+    error.statusCode = 404;
+    return next(error);
+  }
+  clearImage(authorData.imageUrl);
+  res.status(200).json({ message: 'Category Deleted successfully!', category: authorData });
+};
+
+exports.update = async (req, res, next) => {
+  const {
+    params: { authorId },
+    body: { firstName, lastName, dob },
+  } = req;
+
+  let imageUrl = req.body.image;
+  if (req.file) {
+    imageUrl = req.file.path;
+  }
+  if (!imageUrl) {
+    const error = new Error('No image file provided');
+    error.statusCode = 422;
+    return next(error);
+  }
+
+  const author = Author.findOneAndUpdate({ _id: authorId }, { firstName, lastName, dob, imageUrl });
+  const [authorErr, authorData] = await asyncWrapper(author);
+  if (authorErr) {
+    if (!authorErr.statusCode) {
+      authorErr.statusCode = 500;
+    }
+    return next(authorErr);
+  }
+  if (!authorData) {
+    const error = new Error('Author Not Found');
+    error.statusCode = 404;
+    return next(error);
+  }
+  res.status(200).json({ message: 'Author Updated successfully!', author: authorData });
+};
+
+exports.get = async (req, res, next) => {
+  const page = req.query.page || 1;
+  const perPage = 10;
+
+  try {
+    const totalAuthors = await Author.find().countDocuments();
+    const authors = await Author.find()
+      .skip((page - 1) * perPage)
+      .limit(perPage);
+
+    if (authors.length === 0) {
+      const error = new Error('Page not found');
+      error.statusCode = 404;
+      return next(error);
+    }
+
+    res.status(200).json({ message: 'Authors found', authors, totalAuthors });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    return next(err);
+  }
+};

@@ -1,5 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv').config();
+const cors = require('cors');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
@@ -24,7 +25,8 @@ const fileFilter = (req, file, cb) => {
   if (
     file.mimetype === 'image/jpeg' ||
     file.mimetype === 'image/png' ||
-    file.mimetype === 'image/jpg'
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/webp'
   ) {
     cb(null, true);
   } else {
@@ -32,9 +34,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-app.get('/trial', isAuth, (req, res, next) => {
-  res.json('trial')
-});
+app.use(cors());
 app.use(multer({ storage: fileStorage, fileFilter }).single('image'));
 app.use(express.json());
 app.use(routes);

@@ -25,19 +25,19 @@ exports.delete = async (req, res, next) => {
     params: { categoryId },
   } = req;
   const category = Category.findOneAndDelete({ _id: categoryId });
-  const [deleteErr, deleteData] = await asyncWrapper(category);
-  if (deleteErr) {
-    if (!deleteErr.statusCode) {
-      deleteErr.statusCode = 500;
+  const [categoryErr, categoryData] = await asyncWrapper(category);
+  if (categoryErr) {
+    if (!categoryErr.statusCode) {
+      categoryErr.statusCode = 500;
     }
-    return next(deleteErr);
+    return next(categoryErr);
   }
-  if (!deleteData) {
+  if (!categoryData) {
     const error = new Error('Category Not Found');
     error.statusCode = 404;
     return next(error);
   }
-  res.status(200).json({ message: 'Category Deleted successfully!', category: deleteData });
+  res.status(200).json({ message: 'Category Deleted successfully!', category: categoryData });
 };
 
 exports.update = async (req, res, next) => {
@@ -46,40 +46,19 @@ exports.update = async (req, res, next) => {
     body: { name },
   } = req;
   const category = Category.findOneAndUpdate({ _id: categoryId }, { name });
-  const [updateErr, updateData] = await asyncWrapper(category);
-  if (updateErr) {
-    if (!updateErr.statusCode) {
-      updateErr.statusCode = 500;
+  const [categoryErr, categoryData] = await asyncWrapper(category);
+  if (categoryErr) {
+    if (!categoryErr.statusCode) {
+      categoryErr.statusCode = 500;
     }
-    return next(updateErr);
+    return next(categoryErr);
   }
-  if (!updateData) {
+  if (!categoryData) {
     const error = new Error('Category Not Found');
     error.statusCode = 404;
     return next(error);
   }
-  res.status(200).json({ message: 'Category Updated successfully!', category: updateData });
-};
-
-exports.update = async (req, res, next) => {
-  const {
-    params: { categoryId },
-    body: { name },
-  } = req;
-  const category = Category.findOneAndUpdate({ _id: categoryId }, { name });
-  const [updateErr, updateData] = await asyncWrapper(category);
-  if (updateErr) {
-    if (!updateErr.statusCode) {
-      updateErr.statusCode = 500;
-    }
-    return next(updateErr);
-  }
-  if (!updateData) {
-    const error = new Error('Category Not Found');
-    error.statusCode = 404;
-    return next(error);
-  }
-  res.status(200).json({ message: 'Category Updated successfully!', category: updateData });
+  res.status(200).json({ message: 'Category Updated successfully!', category: categoryData });
 };
 
 exports.get = async (req, res, next) => {
