@@ -34,7 +34,7 @@ exports.delete = async (req, res, next) => {
   const {
     params: { authorId },
   } = req;
-  const author = Author.findOneAndDelete({ _id: authorId });
+  const author = Author.findByIdAndDelete(authorId);
   const [authorErr, authorData] = await asyncWrapper(author);
   if (authorErr) {
     if (!authorErr.statusCode) {
@@ -48,7 +48,7 @@ exports.delete = async (req, res, next) => {
     return next(error);
   }
   clearImage(authorData.imageUrl);
-  res.status(200).json({ message: 'Category Deleted successfully!', category: authorData });
+  res.status(200).json({ message: 'Category Deleted successfully!', author: authorData });
 };
 
 exports.update = async (req, res, next) => {
@@ -67,7 +67,7 @@ exports.update = async (req, res, next) => {
     return next(error);
   }
 
-  const author = Author.findOneAndUpdate({ _id: authorId }, { firstName, lastName, dob, imageUrl });
+  const author = Author.findByIdAndUpdate(authorId, { firstName, lastName, dob, imageUrl });
   const [authorErr, authorData] = await asyncWrapper(author);
   if (authorErr) {
     if (!authorErr.statusCode) {
@@ -106,4 +106,24 @@ exports.get = async (req, res, next) => {
     }
     return next(err);
   }
+};
+
+exports.getById = async (req, res, next) => {
+  const {
+    params: { authorId },
+  } = req;
+  const author = Author.findById(authorId);
+  const [authorErr, authorData] = await asyncWrapper(category);
+  if (authorErr) {
+    if (!authorErr.statusCode) {
+      authorErr.statusCode = 500;
+    }
+    return next(authorErr);
+  }
+  if (!authorData) {
+    const error = new Error('Author not found');
+    error.statusCode = 404;
+    return next(error);
+  }
+  res.status(200).json({ message: 'Author found successfully!', author: authorData });
 };

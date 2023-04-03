@@ -24,7 +24,7 @@ exports.delete = async (req, res, next) => {
   const {
     params: { categoryId },
   } = req;
-  const category = Category.findOneAndDelete({ _id: categoryId });
+  const category = Category.findByIdAndDelete(categoryId);
   const [categoryErr, categoryData] = await asyncWrapper(category);
   if (categoryErr) {
     if (!categoryErr.statusCode) {
@@ -45,7 +45,7 @@ exports.update = async (req, res, next) => {
     params: { categoryId },
     body: { name },
   } = req;
-  const category = Category.findOneAndUpdate({ _id: categoryId }, { name });
+  const category = Category.findByIdAndUpdate(categoryId, { name });
   const [categoryErr, categoryData] = await asyncWrapper(category);
   if (categoryErr) {
     if (!categoryErr.statusCode) {
@@ -84,4 +84,24 @@ exports.get = async (req, res, next) => {
     }
     return next(err);
   }
+};
+
+exports.getById = async (req, res, next) => {
+  const {
+    params: { categoryId },
+  } = req;
+  const category = Category.findById(categoryId);
+  const [categoryErr, categoryData] = await asyncWrapper(category);
+  if (categoryErr) {
+    if (!categoryErr.statusCode) {
+      categoryErr.statusCode = 500;
+    }
+    return next(categoryErr);
+  }
+  if (!categoryData) {
+    const error = new Error('Category not found');
+    error.statusCode = 404;
+    return next(error);
+  }
+  res.status(200).json({ message: 'Category found successfully!', category: categoryData });
 };

@@ -5,17 +5,17 @@ const { Schema } = mongoose;
 const reviewSchema = new Schema(
   {
     title: {
-      typeof: 'string',
+      type: String,
       minLnegth: 3,
       required: true,
     },
     content: {
-      typeof: 'string',
+      type: String,
       minLnegth: 3,
       required: true,
     },
     rating: {
-      typeof: 'number',
+      type: Number,
     },
     user: {
       type: Schema.Types.ObjectId,
