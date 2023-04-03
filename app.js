@@ -38,6 +38,7 @@ app.use(cors());
 app.use(multer({ storage: fileStorage, fileFilter }).single('image'));
 app.use(express.json());
 app.use(routes);
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('*', notFound);
 app.use(errorHandler);
 
