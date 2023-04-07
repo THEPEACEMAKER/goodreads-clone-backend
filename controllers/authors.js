@@ -59,7 +59,7 @@ exports.update = async (req, res, next) => {
 
   let imageUrl = req.body.image;
   if (req.file) {
-    imageUrl = req.file.path;
+    imageUrl = req.file.filename;
   }
   if (!imageUrl) {
     const error = new Error('No image file provided');
@@ -113,7 +113,7 @@ exports.getById = async (req, res, next) => {
     params: { authorId },
   } = req;
   const author = Author.findById(authorId);
-  const [authorErr, authorData] = await asyncWrapper(category);
+  const [authorErr, authorData] = await asyncWrapper(author);
   if (authorErr) {
     if (!authorErr.statusCode) {
       authorErr.statusCode = 500;
