@@ -132,10 +132,12 @@ exports.get = async (req, res, next) => {
   const page = req.query.page || 1;
   const perPage = 10;
   try {
+    const populateOptions = 'category author';
     const totalBooks = await Book.find().countDocuments();
-    const books = await Book.find()
+    let books = await Book.find()
       .skip((page - 1) * perPage)
-      .limit(perPage);
+      .limit(perPage)
+      .populate(populateOptions);
 
     if (books.length === 0) {
       const error = new Error('Page not found');
@@ -155,8 +157,17 @@ exports.get = async (req, res, next) => {
 exports.getById = async (req, res, next) => {
   const {
     params: { bookId },
+    query: { populate },
   } = req;
-  const book = Book.findById(bookId);
+  const populateFields = populate ? populate.split(' ') : []; // Adel: for when we need to get the book with its reviews, will need some testing
+  const populateOptions = {
+    category: true,
+    author: true,
+  };
+  if (populateFields.includes('reviews')) {
+    populateOptions.reviews = { path: 'reviews', populate: { path: 'user' } };
+  }
+  const book = Book.findById(bookId).populate(populateOptions);
   const [bookErr, bookData] = await asyncWrapper(book);
   if (bookErr) {
     if (!bookErr.statusCode) {
