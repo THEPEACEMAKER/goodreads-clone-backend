@@ -45,7 +45,7 @@ app.use(errorHandler);
 const {
   env: { PORT, MONGO_URL },
 } = process;
-mongoose.connect(MONGO_URL);
+mongoose.connect("mongodb+srv://test:test@cluster0.dhueo.mongodb.net/?retryWrites=true&w=majority");
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
