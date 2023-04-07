@@ -7,11 +7,13 @@ exports.add = async (req, res, next) => {
     body: { firstName, lastName, dob },
   } = req;
   if (!req.file) {
-    const error = new Error('No image file provided');
-    error.statusCode = 422;
-    return next(error);
+    imageUrl="http://localhost:3000/images/default_author.jpg";
+    // const error = new Error('No image file provided');
+    // error.statusCode = 422;
+    // return next(error);
   }
-  const imageUrl = req.file.path;
+  else
+    imageUrl = req.file.path;
 
   const author = new Author({
     firstName,
@@ -56,18 +58,22 @@ exports.update = async (req, res, next) => {
     params: { authorId },
     body: { firstName, lastName, dob },
   } = req;
-
+  let updates = {};
   let imageUrl = req.body.image;
   if (req.file) {
     imageUrl = req.file.path;
   }
   if (!imageUrl) {
-    const error = new Error('No image file provided');
-    error.statusCode = 422;
-    return next(error);
+    updates = {firstName,lastName,dob}
+    // const error = new Error('No image file provided');
+    // error.statusCode = 422;
+    // return next(error);
+  }
+  else{
+    updates = {firstName,lastName,dob,imageUrl}
   }
 
-  const author = Author.findByIdAndUpdate(authorId, { firstName, lastName, dob, imageUrl });
+  const author = Author.findByIdAndUpdate(authorId, updates);
   const [authorErr, authorData] = await asyncWrapper(author);
   if (authorErr) {
     if (!authorErr.statusCode) {
