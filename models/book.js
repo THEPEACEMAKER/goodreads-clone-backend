@@ -17,20 +17,16 @@ const bookSchema = new Schema(
     imageUrl: {
       type: String,
     },
-    category: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'Category',
-        required: true,
-      },
-    ],
-    author: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'Author',
-        required: true,
-      },
-    ],
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
+      required: true,
+    },
+    author: {
+      type: Schema.Types.ObjectId,
+      ref: 'Author',
+      required: true,
+    },
     avgRating: {
       type: Number,
     },
