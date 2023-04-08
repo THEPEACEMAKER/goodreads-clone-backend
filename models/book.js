@@ -11,7 +11,7 @@ const bookSchema = new Schema(
     },
     description: {
       type: String,
-      minLength: 40,
+      minLength: 10,
       required: true,
     },
     imageUrl: {

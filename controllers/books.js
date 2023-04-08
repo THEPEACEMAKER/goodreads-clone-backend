@@ -6,7 +6,7 @@ const clearImage = require('../utils/clearImage');
 
 exports.add = async (req, res, next) => {
   const {
-    body: { name, categoryId, authorId },
+    body: { name, description, categoryId, authorId },
   } = req;
 
   try {
@@ -39,6 +39,7 @@ exports.add = async (req, res, next) => {
 
   const book = new Book({
     name,
+    description,
     imageUrl,
     category: categoryId,
     author: authorId,
