@@ -9,6 +9,11 @@ const bookSchema = new Schema(
       minLength: 3,
       required: true,
     },
+    description: {
+      type: String,
+      minLength: 40,
+      required: true,
+    },
     imageUrl: {
       type: String,
     },
