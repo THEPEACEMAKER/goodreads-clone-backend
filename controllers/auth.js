@@ -60,7 +60,7 @@ exports.signup = async (req, res, next) => {
     error.statusCode = 422;
     return next(error);
   }
-  const imageUrl = req.file.path;
+  const imageUrl = `http://localhost:3000/images/${req.file.filename}`;
 
   const hashedPassword = bcrypt.hash(password, 12);
   const [hashedPasswordErr, hashedPasswordData] = await asyncWrapper(hashedPassword);
