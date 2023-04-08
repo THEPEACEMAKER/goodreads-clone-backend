@@ -35,7 +35,7 @@ exports.add = async (req, res, next) => {
     error.statusCode = 422;
     return next(error);
   }
-  const imageUrl = req.file.path;
+  const imageUrl = `http://localhost:3000/images/${req.file.filename}`;
 
   const book = new Book({
     name,

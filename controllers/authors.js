@@ -7,13 +7,11 @@ exports.add = async (req, res, next) => {
     body: { firstName, lastName, dob },
   } = req;
   if (!req.file) {
-    imageUrl="http://localhost:3000/images/default_author.jpg";
+    imageUrl = 'http://localhost:3000/images/default_author.jpg';
     // const error = new Error('No image file provided');
     // error.statusCode = 422;
     // return next(error);
-  }
-  else
-    imageUrl = req.file.path;
+  } else imageUrl = `http://localhost:3000/images/${req.file.filename}`;
 
   const author = new Author({
     firstName,
@@ -64,13 +62,12 @@ exports.update = async (req, res, next) => {
     imageUrl = req.file.filename;
   }
   if (!imageUrl) {
-    updates = {firstName,lastName,dob}
+    updates = { firstName, lastName, dob };
     // const error = new Error('No image file provided');
     // error.statusCode = 422;
     // return next(error);
-  }
-  else{
-    updates = {firstName,lastName,dob,imageUrl}
+  } else {
+    updates = { firstName, lastName, dob, imageUrl };
   }
 
   const author = Author.findByIdAndUpdate(authorId, updates);
