@@ -11,5 +11,6 @@ router.use('/user', authRoutes);
 router.use('/categories', categoriesRoutes);
 router.use('/authors', authorsRoutes);
 router.use('/books', booksRoutes);
+router.use('/reviews', reviewsRoutes);
 
 module.exports = router;
