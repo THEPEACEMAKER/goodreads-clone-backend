@@ -1,44 +1,7 @@
 const asyncWrapper = require('../utils/asyncWrapper');
-const Reviews = require('../models/review');
+const Review = require('../models/review');
 const Book = require('../models/book');
 const User = require('../models/user');
-
-
-
-
-// exports.add = async (req, res, next) => {
-//     const { title, content, rating, userId, bookId } = req.body;
-  
-//     try {
-//       const book = await Book.findById(bookId);
-//       const user = await User.findById(userId);
-  
-//       if (!book) {
-//         return res.status(404).json({ message: 'book not found' });
-//       }
-  
-//       if (!user) {
-//         return res.status(404).json({ message: 'user not found' });
-//       }
-  
-//       const review = new Reviews({
-//         title,
-//         content,
-//         rating,
-//         user: userId,
-//         book: bookId,
-//       });
-  
-//       const savedReview = await review.save();
-  
-//       res.status(201).json({
-//         message: 'Review Added Successfully!',
-//         review: savedReview,
-//       });
-//     } catch (err) {
-//       next(err);
-//     }
-//   };
 
 
 exports.add = async (req, res, next) => {
@@ -65,7 +28,7 @@ exports.add = async (req, res, next) => {
         }
       }
 
-    const reviews = new Reviews({
+    const review = new Review({
         title,
         content,
         rating,
@@ -73,7 +36,7 @@ exports.add = async (req, res, next) => {
         book: bookId,
     });
 
-    const [reviewErr, reviewData] = await asyncWrapper(reviews.save());
+    const [reviewErr, reviewData] = await asyncWrapper(review.save());
     if (reviewErr) {
         if (!reviewErr.statusCode) {
         reviewErr.statusCode = 500;
@@ -89,13 +52,45 @@ exports.add = async (req, res, next) => {
 
 
 
-    // db.query(query)
-    //   .then(() => {
-    //     res.sendStatus(201);
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //     res.sendStatus(500);
-    //   });
+exports.update = async (req, res, next) => {
+    const {
+      params: { reviewId },
+      body: { title, content, rating },
+    } = req;
+    let updates = {title, content, rating};
+    const review = Review.findByIdAndUpdate(reviewId, updates);
+    const [reviewErr, reviewData] = await asyncWrapper(review);
+    if (reviewErr) {
+      if (!reviewErr.statusCode) {
+        reviewErr.statusCode = 500;
+      }
+      return next(reviewErr);
+    }
+    if (!reviewData) {
+      const error = new Error('Review Not Found');
+      error.statusCode = 404;
+      return next(error);
+    }
+    res.status(200).json({ message: 'Review Updated successfully!', review: reviewData });
+  };
 
 
+  exports.delete = async (req, res, next) => {
+    const {
+      params: { reviewId },
+    } = req;
+    const review = Review.findByIdAndDelete(reviewId);
+    const [reviewErr, reviewData] = await asyncWrapper(review);
+    if (reviewErr) {
+      if (!reviewErr.statusCode) {
+        reviewErr.statusCode = 500;
+      }
+      return next(reviewErr);
+    }
+    if (!reviewData) {
+      const error = new Error('Review Not Found');
+      error.statusCode = 404;
+      return next(error);
+    }
+    res.status(200).json({ message: 'Review Deleted successfully!', review: reviewData });
+  };
