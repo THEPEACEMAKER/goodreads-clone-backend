@@ -6,7 +6,7 @@ const clearImage = require('../utils/clearImage');
 
 exports.add = async (req, res, next) => {
   const {
-    body: { name, categoryId, authorId },
+    body: { name, description, categoryId, authorId },
   } = req;
 
   try {
@@ -35,10 +35,11 @@ exports.add = async (req, res, next) => {
     error.statusCode = 422;
     return next(error);
   }
-  const imageUrl = req.file.path;
+  const imageUrl = `http://localhost:3000/images/${req.file.filename}`;
 
   const book = new Book({
     name,
+    description,
     imageUrl,
     category: categoryId,
     author: authorId,

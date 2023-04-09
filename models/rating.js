@@ -1,18 +1,10 @@
-/* eslint-disable linebreak-style */
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
-const reviewSchema = new Schema(
+const ratingSchema = new Schema(
   {
-    title: {
-      type: String,
-      minLnegth: 3,
-      required: true,
-    },
-    content: {
-      type: String,
-      minLnegth: 3,
-      required: true,
+    rating: {
+      type: Number,
     },
     user: {
       type: Schema.Types.ObjectId,
@@ -30,4 +22,4 @@ const reviewSchema = new Schema(
   }
 );
 
-module.exports = mongoose.model('Review', reviewSchema);
+module.exports = mongoose.model('Rating', ratingSchema);

@@ -11,26 +11,22 @@ const bookSchema = new Schema(
     },
     description: {
       type: String,
-      minLength: 40,
+      minLength: 10,
       required: true,
     },
     imageUrl: {
       type: String,
     },
-    category: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'Category',
-        required: true,
-      },
-    ],
-    author: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'Author',
-        required: true,
-      },
-    ],
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
+      required: true,
+    },
+    author: {
+      type: Schema.Types.ObjectId,
+      ref: 'Author',
+      required: true,
+    },
     avgRating: {
       type: Number,
     },
