@@ -43,12 +43,12 @@ exports.delete = async (req, res, next) => {
     return next(authorErr);
   }
   if (!authorData) {
-    const error = new Error('Category Not Found');
+    const error = new Error('Author Not Found');
     error.statusCode = 404;
     return next(error);
   }
   clearImage(authorData.imageUrl);
-  res.status(200).json({ message: 'Category Deleted successfully!', author: authorData });
+  res.status(200).json({ message: 'Author Deleted successfully!', author: authorData });
 };
 
 exports.update = async (req, res, next) => {
