@@ -10,6 +10,3 @@ module.exports = (filePath) => {
   //     console.log('after2');
   // });
 };
-
-    });
-}

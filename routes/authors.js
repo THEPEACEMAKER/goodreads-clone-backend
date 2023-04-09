@@ -1,11 +1,12 @@
 const express = require('express');
 const authorsController = require('../controllers/authors');
+const isAuth = require('../middlewares/isAuth');
 
 const router = express.Router();
 
-router.post('/', authorsController.add);
-router.delete('/:authorId', authorsController.delete);
-router.patch('/:authorId', authorsController.update);
+router.post('/', isAuth, authorsController.add);
+router.delete('/:authorId', isAuth, authorsController.delete);
+router.patch('/:authorId', isAuth, authorsController.update);
 router.get('/', authorsController.get);
 router.get('/:authorId', authorsController.getById);
 
