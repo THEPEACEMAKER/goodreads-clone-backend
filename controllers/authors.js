@@ -59,6 +59,7 @@ exports.update = async (req, res, next) => {
   let updates = {};
   let imageUrl = req.body.image;
   if (req.file) {
+    console.log(req.file);
     imageUrl = req.file.filename;
   }
   if (!imageUrl) {
