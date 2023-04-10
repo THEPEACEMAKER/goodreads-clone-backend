@@ -5,7 +5,9 @@ const User = require('../models/user');
 
 
 exports.add = async (req, res, next) => {
-    const { title, content, rating, userId, bookId } = req.body;
+    const userId = req.userId;
+    const bookId = req.params.bookId;
+    const { title, content} = req.body;
     
     try {
         const book = await Book.findById(bookId);
@@ -31,7 +33,6 @@ exports.add = async (req, res, next) => {
     const review = new Review({
         title,
         content,
-        rating,
         user: userId,
         book: bookId,
     });
@@ -55,7 +56,7 @@ exports.add = async (req, res, next) => {
 exports.update = async (req, res, next) => {
     const {
       params: { reviewId },
-      body: { title, content, rating },
+      body: { title, content},
     } = req;
     let updates = {title, content, rating};
     const review = Review.findByIdAndUpdate(reviewId, updates);
