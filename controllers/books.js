@@ -83,7 +83,7 @@ exports.update = async (req, res, next) => {
   } = req;
   let imageUrl = req.body.image;
   if (req.file) {
-    imageUrl = req.file.path;
+    imageUrl = `http://localhost:3000/images/${req.file.filename}`;
   }
   if (!imageUrl) {
     const error = new Error('No image file provided');
@@ -111,7 +111,11 @@ exports.update = async (req, res, next) => {
     }
   }
 
-  const book = Book.findByIdAndUpdate(bookId, { name, categoryId, authorId, imageUrl });
+  const book = Book.findByIdAndUpdate(
+    bookId,
+    { name, categoryId, authorId, imageUrl },
+    { new: true }
+  );
   const [bookErr, bookData] = await asyncWrapper(book);
   if (bookErr) {
     if (!bookErr.statusCode) {
