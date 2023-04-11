@@ -111,11 +111,18 @@ exports.update = async (req, res, next) => {
     }
   }
 
+  const populateOptions = {
+    category: { path: 'category', select: 'name -_id' },
+    author: { path: 'author', select: 'firstName lastName -_id' },
+  };
   const book = Book.findByIdAndUpdate(
     bookId,
-    { name, description, categoryId, authorId, imageUrl },
+    { name, description, category: categoryId, author: authorId, imageUrl },
     { new: true }
-  );
+  )
+    .populate(populateOptions.category)
+    .populate(populateOptions.author);
+
   const [bookErr, bookData] = await asyncWrapper(book);
   if (bookErr) {
     if (!bookErr.statusCode) {
