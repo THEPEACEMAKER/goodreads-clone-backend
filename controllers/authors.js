@@ -1,4 +1,5 @@
 const Author = require('../models/author');
+const Book = require('../models/book');
 const asyncWrapper = require('../utils/asyncWrapper');
 const clearImage = require('../utils/clearImage');
 
@@ -131,3 +132,21 @@ exports.getById = async (req, res, next) => {
   }
   res.status(200).json({ message: 'Author found successfully!', author: authorData });
 };
+
+
+exports.getAuthorBooks = async (req, res, next) => {
+  const {authorId}=req.params;
+  let books = Book.find({author:authorId}).populate({
+    path: 'author',
+    select: 'firstName lastName -_id'
+  }).exec();
+  const [booksErr,BooksData] = await asyncWrapper(books);
+  if(booksErr) {
+    if(!booksErr.statusCode){
+      booksErr.statusCode=500;
+    }
+    return next(booksErr)
+  }
+  res.status(200).json({message:"successfully found Books",authorBooks:BooksData});
+}
+
