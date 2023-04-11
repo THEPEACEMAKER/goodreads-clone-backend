@@ -58,7 +58,7 @@ exports.update = async (req, res, next) => {
       params: { reviewId },
       body: { title, content},
     } = req;
-    let updates = {title, content, rating};
+    let updates = {title, content};
     const review = Review.findByIdAndUpdate(reviewId, updates);
     const [reviewErr, reviewData] = await asyncWrapper(review);
     if (reviewErr) {

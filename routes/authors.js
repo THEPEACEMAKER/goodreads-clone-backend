@@ -9,5 +9,5 @@ router.delete('/:authorId', isAuth, authorsController.delete);
 router.patch('/:authorId', isAuth, authorsController.update);
 router.get('/', authorsController.get);
 router.get('/:authorId', authorsController.getById);
-
+router.get('/:authorId/books',authorsController.getAuthorBooks)
 module.exports = router;
