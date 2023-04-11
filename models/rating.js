@@ -3,15 +3,15 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const ratingSchema = new Schema(
   {
-    rating: {
+    rate: {
       type: Number,
     },
-    user: {
+    userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
-    book: {
+    bookId: {
       type: Schema.Types.ObjectId,
       ref: 'Book',
       required: true,
