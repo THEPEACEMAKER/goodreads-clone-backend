@@ -111,11 +111,18 @@ exports.update = async (req, res, next) => {
     }
   }
 
+  const populateOptions = {
+    category: { path: 'category', select: 'name -_id' },
+    author: { path: 'author', select: 'firstName lastName -_id' },
+  };
   const book = Book.findByIdAndUpdate(
     bookId,
-    { name, description, categoryId, authorId, imageUrl },
+    { name, description, category: categoryId, author: authorId, imageUrl },
     { new: true }
-  );
+  )
+    .populate(populateOptions.category)
+    .populate(populateOptions.author);
+
   const [bookErr, bookData] = await asyncWrapper(book);
   if (bookErr) {
     if (!bookErr.statusCode) {
@@ -127,7 +134,6 @@ exports.update = async (req, res, next) => {
     const error = new Error('Book not found');
     error.statusCode = 404;
     return next(error);
-    s;
   }
 
   res.status(200).json({ message: 'Book Updated Successfully!', book: bookData });
@@ -138,8 +144,8 @@ exports.get = async (req, res, next) => {
   const perPage = 10;
   try {
     const populateOptions = {
-      category: { path: 'category', select: 'name -_id' },
-      author: { path: 'author', select: 'firstName lastName -_id' },
+      category: { path: 'category', select: 'name' },
+      author: { path: 'author', select: 'firstName lastName' },
     };
     const totalBooks = await Book.find().countDocuments();
     let books = await Book.find()
