@@ -127,7 +127,6 @@ exports.update = async (req, res, next) => {
     const error = new Error('Book not found');
     error.statusCode = 404;
     return next(error);
-    s;
   }
 
   res.status(200).json({ message: 'Book Updated Successfully!', book: bookData });
