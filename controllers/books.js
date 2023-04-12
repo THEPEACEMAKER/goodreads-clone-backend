@@ -174,7 +174,7 @@ exports.update = async (req, res, next) => {
 
 exports.get = async (req, res, next) => {
   const page = req.query.page || 1;
-  const perPage = 10;
+  const perPage = req.query.perPage||10;
   try {
     const populateOptions = {
       category: { path: 'category', select: 'name' },
