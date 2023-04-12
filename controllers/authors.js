@@ -135,11 +135,15 @@ exports.getById = async (req, res, next) => {
 
 
 exports.getAuthorBooks = async (req, res, next) => {
+  const page = req.query.page || 1;
+  const perPage = req.query.perPage || 6;
   const {authorId}=req.params;
+  let total = await Book.find({author:authorId}).count();
   let books = Book.find({author:authorId}).populate({
     path: 'author',
     select: 'firstName lastName -_id'
-  }).exec();
+  }).skip((page - 1) * perPage)
+  .limit(perPage);
   const [booksErr,BooksData] = await asyncWrapper(books);
   if(booksErr) {
     if(!booksErr.statusCode){
@@ -147,6 +151,6 @@ exports.getAuthorBooks = async (req, res, next) => {
     }
     return next(booksErr)
   }
-  res.status(200).json({message:"successfully found Books",authorBooks:BooksData});
+  res.status(200).json({message:"successfully found Books",authorBooks:BooksData,totalBooks:total});
 }
 
