@@ -134,8 +134,8 @@ exports.get = async (req, res, next) => {
   const perPage = 10;
   try {
     const populateOptions = {
-      category: { path: 'category', select: 'name -_id' },
-      author: { path: 'author', select: 'firstName lastName -_id' },
+      category: { path: 'category', select: 'name' },
+      author: { path: 'author', select: 'firstName lastName' },
     };
     const totalBooks = await Book.find().countDocuments();
     let books = await Book.find()
