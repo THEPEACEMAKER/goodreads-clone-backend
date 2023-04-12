@@ -8,6 +8,14 @@ const categorySchema = new Schema({
     minLength: 3,
     required: true,
   },
+  booksCount: {
+    type: Number,
+    default: 0,
+  },
+  ratingsCount: {
+    type: Number,
+    default: 0,
+  },
 });
 
 module.exports = mongoose.model('Category', categorySchema);
