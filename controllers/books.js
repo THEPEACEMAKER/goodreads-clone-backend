@@ -5,84 +5,94 @@ const asyncWrapper = require('../utils/asyncWrapper');
 const clearImage = require('../utils/clearImage');
 
 exports.add = async (req, res, next) => {
-  const {
-    body: { name, description, categoryId, authorId },
-  } = req;
-
-  let author, category;
   try {
-    category = await Category.findById(categoryId);
-    author = await Author.findById(authorId);
+    const { name, description, categoryId, authorId } = req.body;
+
+    const [category, author] = await Promise.all([
+      Category.findById(categoryId),
+      Author.findById(authorId),
+    ]);
+
     if (!category) {
       const error = new Error('Category not found');
       error.statusCode = 404;
-      return next(error);
+      throw error;
     }
 
     if (!author) {
       const error = new Error('Author not found');
       error.statusCode = 404;
-      return next(error);
+      throw error;
     }
+
+    if (!req.file) {
+      const error = new Error('No image file provided');
+      error.statusCode = 422;
+      throw error;
+    }
+
+    const imageUrl = `http://localhost:3000/images/${req.file.filename}`;
+
+    const book = new Book({
+      name,
+      description,
+      imageUrl,
+      category: categoryId,
+      author: authorId,
+    });
+
+    const bookData = await book.save();
+
+    // Increase booksCount of author and category
+    author.booksCount += 1;
+    category.booksCount += 1;
+
+    // Save updated author and category objects
+    await Promise.all([author.save(), category.save()]);
+
+    res.status(201).json({ message: 'Book Created Successfully!', bookId: bookData._id });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
-      return next(err);
     }
+    next(err);
   }
-
-  if (!req.file) {
-    const error = new Error('No image file provided');
-    error.statusCode = 422;
-    return next(error);
-  }
-  const imageUrl = `http://localhost:3000/images/${req.file.filename}`;
-
-  const book = new Book({
-    name,
-    description,
-    imageUrl,
-    category: categoryId,
-    author: authorId,
-  });
-
-  const [bookErr, bookData] = await asyncWrapper(book.save());
-  if (bookErr) {
-    if (!bookErr.statusCode) {
-      bookErr.statusCode = 500;
-    }
-    return next(bookErr);
-  }
-
-  // Increase booksCount of author and category
-  author.booksCount += 1;
-  category.booksCount += 1;
-
-  // Save updated author and category objects
-  await author.save();
-  await category.save();
-  res.status(201).json({ message: 'Book Created Successfully!', bookId: bookData._id });
 };
 
 exports.delete = async (req, res, next) => {
-  const {
-    params: { bookId },
-  } = req;
-  const book = Book.findByIdAndDelete(bookId);
-  const [bookErr, bookData] = await asyncWrapper(book);
-  if (bookErr) {
-    if (!bookErr.statusCode) {
-      bookErr.statusCode = 500;
+  const { bookId } = req.params;
+
+  try {
+    const book = await Book.findById(bookId).populate('author').populate('category');
+
+    if (!book) {
+      const error = new Error('Book not found');
+      error.statusCode = 404;
+      throw error;
     }
-    return next(bookErr);
+
+    const author = book.author;
+    const category = book.category;
+
+    // Delete the book
+    const deletedBook = await Book.findByIdAndDelete(bookId);
+
+    // Decrease booksCount of author and category
+    author.booksCount -= author.booksCount > 0 ? 1 : 0;
+    category.booksCount -= category.booksCount > 0 ? 1 : 0;
+
+    // Save updated author and category objects
+    await Promise.all([author.save(), category.save()]);
+
+    clearImage(deletedBook.imageUrl);
+
+    res.status(200).json({ message: 'Book deleted successfully!', book: deletedBook });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
   }
-  if (!bookData) {
-    const error = new Error('Book Not Found');
-    error.statusCode = 404;
-    return next(error);
-  }
-  clearImage(bookData.imageUrl);
-  res.status(200).json({ message: 'Book Deleted successfully!', book: bookData });
 };
 
 exports.update = async (req, res, next) => {
@@ -90,6 +100,7 @@ exports.update = async (req, res, next) => {
     body: { name, description, categoryId, authorId },
     params: { bookId },
   } = req;
+
   let imageUrl = req.body.image;
   if (req.file) {
     imageUrl = `http://localhost:3000/images/${req.file.filename}`;
@@ -100,75 +111,70 @@ exports.update = async (req, res, next) => {
     return next(error);
   }
 
-  let author, category;
   try {
-    category = await Category.findById(categoryId);
-    author = await Author.findById(authorId);
+    const [book, author, category] = await Promise.all([
+      Book.findById(bookId).populate('author').populate('category'),
+      Author.findById(authorId),
+      Category.findById(categoryId),
+    ]);
+
+    if (!book) {
+      const error = new Error('Book not found');
+      error.statusCode = 404;
+      throw error;
+    }
+
     if (!category) {
       const error = new Error('Category not found');
       error.statusCode = 404;
-      return next(error);
+      throw error;
     }
 
     if (!author) {
       const error = new Error('Author not found');
       error.statusCode = 404;
-      return next(error);
+      throw error;
     }
+
+    const shouldUpdateCategoryCount = book.category._id.toString() !== categoryId;
+    const shouldUpdateAuthorCount = book.author._id.toString() !== authorId;
+
+    if (shouldUpdateCategoryCount) {
+      const oldCategory = await Category.findById(book.category);
+      oldCategory.booksCount -= oldCategory.booksCount > 0 ? 1 : 0;
+      await oldCategory.save();
+      category.booksCount += 1;
+      await category.save();
+    }
+
+    if (shouldUpdateAuthorCount) {
+      const oldAuthor = await Author.findById(book.author);
+      oldAuthor.booksCount -= oldAuthor.booksCount > 0 ? 1 : 0;
+      await oldAuthor.save();
+      author.booksCount += 1;
+      await author.save();
+    }
+
+    const updatedBook = await Book.findByIdAndUpdate(
+      bookId,
+      { name, description, category: categoryId, author: authorId, imageUrl },
+      { new: true }
+    )
+      .populate('author')
+      .populate('category');
+
+    res.status(200).json({ message: 'Book Updated Successfully!', book: updatedBook });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
-      return next(err);
     }
+    next(err);
   }
-
-  const populateOptions = {
-    category: { path: 'category', select: 'name' },
-    author: { path: 'author', select: 'firstName lastName' },
-  };
-  const book = await Book.findById(bookId)
-    .populate(populateOptions.category)
-    .populate(populateOptions.author);
-
-  if (!book) {
-    const error = new Error('Book not found');
-    error.statusCode = 404;
-    return next(error);
-  }
-
-  if (book.category._id.toString() !== categoryId) {
-    const oldCategory = await Category.findById(book.category);
-    // Update booksCount of old category
-    oldCategory.booksCount -= 1;
-    await oldCategory.save();
-    // Update booksCount of new category
-    category.booksCount += 1;
-    await category.save();
-  }
-  if (book.author._id.toString() !== authorId) {
-    const oldAuthor = await Author.findById(book.author);
-    // Update booksCount of old author
-    oldAuthor.booksCount -= 1;
-    await oldAuthor.save();
-    // Update booksCount of new author
-    author.booksCount += 1;
-    await author.save();
-  }
-
-  const updatedBook = await Book.findByIdAndUpdate(
-    bookId,
-    { name, description, category: categoryId, author: authorId, imageUrl },
-    { new: true }
-  )
-    .populate(populateOptions.category)
-    .populate(populateOptions.author);
-
-  res.status(200).json({ message: 'Book Updated Successfully!', book: updatedBook });
 };
 
 exports.get = async (req, res, next) => {
   const page = req.query.page || 1;
-  const perPage = 10;
+  const perPage = req.query.perPage||10;
   try {
     const populateOptions = {
       category: { path: 'category', select: 'name' },
