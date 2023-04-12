@@ -20,6 +20,14 @@ const authorSchema = new Schema({
   imageUrl: {
     type: String,
   },
+  booksCount: {
+    type: Number,
+    default: 0,
+  },
+  ratingsCount: {
+    type: Number,
+    default: 0,
+  },
 });
 
 module.exports = mongoose.model('Author', authorSchema);
