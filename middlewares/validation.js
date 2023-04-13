@@ -157,6 +157,14 @@ const reviewSchema = Joi.object({
     .required(),
 });
 
+const shelfSchema = Joi.object({
+  bookId: Joi.string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .trim()
+    .required(),
+  shelf: Joi.string().valid('WANT TO READ', 'CURRENTLY READING', 'READ').required(),
+});
+
 exports.validateSignup = (req, res, next) => {
   const { error, data } = signupSchema.validate(req.body);
   if (error) {
@@ -213,6 +221,15 @@ exports.validateRatingData = (req, res, next) => {
 
 exports.validateReviewData = (req, res, next) => {
   const { error, data } = reviewSchema.validate(req.body);
+  if (error) {
+    return next(error);
+  }
+  req.validatedData = data;
+  next();
+};
+
+exports.validateShelfData = (req, res, next) => {
+  const { error, data } = shelfSchema.validate(req.body);
   if (error) {
     return next(error);
   }
