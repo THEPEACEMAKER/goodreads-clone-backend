@@ -29,6 +29,11 @@ const bookSchema = new Schema(
     },
     avgRating: {
       type: Number,
+      default: 0,
+    },
+    ratingsCount: {
+      type: Number,
+      default: 0,
     },
     reviews: {
       type: Schema.Types.ObjectId,
