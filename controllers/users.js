@@ -3,11 +3,12 @@ const Book = require('../models/book');
 const asyncWrapper = require('../utils/asyncWrapper');
 
 exports.addToShelf = async (req, res, next) => {
+  console.log('1');
   const {
     body: { bookId, shelf },
     userId,
   } = req;
-
+  console.log(userId);
   try {
     const user = await User.findById(userId).populate('books.book');
     if (!user) {
@@ -15,6 +16,7 @@ exports.addToShelf = async (req, res, next) => {
       error.statusCode = 404;
       return next(error);
     }
+  console.log('2');
 
     const book = await Book.findById(bookId);
     if (!book) {
@@ -22,19 +24,24 @@ exports.addToShelf = async (req, res, next) => {
       error.statusCode = 404;
       return next(error);
     }
+  console.log('3');
 
-    const existingBook = user.books.find((book) => book.book._id.toString() === bookId);
-    if (existingBook) {
-      const error = new Error('Book already exists in user shelves');
-      error.statusCode = 400;
-      return next(error);
-    }
-
+    // const existingBook = user.books.find((book) => book.book._id.toString() === bookId);
+    // if (existingBook) {
+    //   const error = new Error('Book already exists in user shelves');
+    //   error.statusCode = 400;
+    //   return next(error);
+    // }
+    
+  console.log('4');
+    console.log(shelf);
     user.books.push({ book: bookId, shelf });
     const userw = await user.save();
     console.log(userw.books);
+  
+    console.log('5');
 
-    return res.status(200).json({ message: 'Book Added successfully' });
+    return res.status(200).json({ message: 'Book Added to Shelf successfully' });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

@@ -42,6 +42,7 @@ const userSchema = new Schema(
           ref: 'Book',
         },
         shelf: {
+          type: String,
           enum: ['WANT TO READ', 'CURRENTLY READING', 'READ'],
         },
       },
