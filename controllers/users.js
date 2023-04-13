@@ -32,7 +32,7 @@ exports.addToShelf = async (req, res, next) => {
     //   error.statusCode = 400;
     //   return next(error);
     // }
-    
+
   console.log('4');
     console.log(shelf);
     user.books.push({ book: bookId, shelf });
@@ -97,7 +97,7 @@ exports.deleteFromShelf = async (req, res, next) => {
 
     const userData = await User.findByIdAndUpdate(
       userId,
-      { $pull: { books: { book: bookId } } },
+      { $pull: { books: { book: bookId , shelf} } },
       { new: true }
     );
 
