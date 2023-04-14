@@ -6,7 +6,7 @@ const Book = require('../models/book');
 
 exports.addRating = async (req, res, next) => {
   try {
-    const userId = req.userId;
+    const userId = req.user._id;
     const bookId = req.params.bookId;
     const { rate } = req.body;
 

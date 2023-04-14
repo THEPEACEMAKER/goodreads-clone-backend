@@ -5,7 +5,7 @@ const User = require('../models/user');
 
 
 exports.add = async (req, res, next) => {
-    const userId = req.userId;
+    const userId = req.user._id;
     const bookId = req.params.bookId;
     const { title, content} = req.body;
     

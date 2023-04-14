@@ -32,6 +32,6 @@ module.exports = async (req, res, next) => {
     error.status = 401;
     return next(error);
   }
-  req.userId = userData._id;
+  req.user = userData;
   next();
 };

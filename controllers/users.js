@@ -6,8 +6,8 @@ exports.addToShelf = async (req, res, next) => {
   console.log('1');
   const {
     body: { bookId, shelf },
-    userId,
   } = req;
+  const userId = req.user._id;
   console.log(userId);
   try {
     const user = await User.findById(userId).populate('books.book');
@@ -54,9 +54,8 @@ exports.updateShelf = async (req, res, next) => {
   const {
     body: { shelf },
     params: { bookId },
-    userId,
   } = req;
-
+  const userId = req.user._id;
   const result = User.findOneAndUpdate(
     { _id: userId, 'books.book': bookId },
     { $set: { 'books.$.shelf': shelf } },
@@ -83,9 +82,8 @@ exports.updateShelf = async (req, res, next) => {
 exports.deleteFromShelf = async (req, res, next) => {
   const {
     body: { bookId },
-    userId,
   } = req;
-
+  const userId = req.user._id;
   try {
     const user = await User.findById(userId).exec();
     if (!user) {
