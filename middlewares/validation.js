@@ -153,7 +153,7 @@ const shelfSchema = Joi.object({
     .pattern(/^[0-9a-fA-F]{24}$/)
     .trim()
     .required(),
-  shelf: Joi.string().valid('WANT TO READ', 'CURRENTLY READING', 'READ', 'NONE').required(),
+  shelf: Joi.string().valid('WANT_TO_READ', 'CURRENTLY_READING', 'READ', 'NONE').required(),
 });
 
 exports.validateSignup = (req, res, next) => {

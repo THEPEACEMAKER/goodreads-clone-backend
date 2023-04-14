@@ -9,7 +9,7 @@ const bookShelfSchema = new Schema({
   },
   shelfName: {
     type: String,
-    enum: ['WANT TO READ', 'CURRENTLY READING', 'READ'],
+    enum: ['WANT_TO_READ', 'CURRENTLY_READING', 'READ'],
     required: true,
   },
   book: {

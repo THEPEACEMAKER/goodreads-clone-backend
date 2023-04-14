@@ -1,6 +1,5 @@
 const User = require('../models/user');
 const Book = require('../models/book');
-const asyncWrapper = require('../utils/asyncWrapper');
 const BookShelf = require('../models/shelf');
 
 exports.addToShelf = async (req, res, next) => {
@@ -51,36 +50,25 @@ exports.addToShelf = async (req, res, next) => {
 
 // http://localhost:3000/user/books
 // http://localhost:3000/user/books?shelf=READ
-// http://localhost:3000/user/books?shelf=CURRENTLY%20READING
-// http://localhost:3000/user/books?shelf=WANT%20TO%20READ
+// http://localhost:3000/user/books?shelf=CURRENTLY_READING
+// http://localhost:3000/user/books?shelf=WANT_TO_READ
 exports.getUserBooks = async (req, res, next) => {
-  const { userId } = req;
+  const userId = req.user._id;
   let { shelf, page = 1, perPage = 10 } = req.query;
 
-  const query = { _id: userId };
+  const query = { user: userId };
   if (shelf) {
-    // query['books.shelf'] = shelf; // can't find any books
-    // query['books.book.shelf'] = shelf; // all books
-    query['books'] = { $elemMatch: { shelf } }; // all books
+    query.shelfName = shelf;
   }
 
   try {
-    const user = await User.findOne(query).populate({
-      path: 'books.book',
-      options: {
-        skip: (page - 1) * perPage,
-        limit: perPage,
-      },
-    });
+    const bookShelves = await BookShelf.find(query)
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .populate('book');
 
-    if (!user) {
-      const error = new Error("Couldn't find the user books");
-      error.statusCode = 404;
-      return next(error);
-    }
-
-    const books = user.books.map((book) => book.book);
-    const totalBooks = books.length;
+    const books = bookShelves.map((bookShelf) => bookShelf.book);
+    const totalBooks = await BookShelf.countDocuments(query);
 
     return res.status(200).json({ books, totalBooks });
   } catch (err) {
