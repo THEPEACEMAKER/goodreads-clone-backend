@@ -25,6 +25,22 @@ exports.delete = async (req, res, next) => {
   const {
     params: { categoryId },
   } = req;
+
+  const categoryBook = Book.findOne({ category: categoryId });
+  const [bookErr, bookData] = await asyncWrapper(categoryBook);
+  if (bookErr) {
+    if (!bookErr.statusCode) {
+      bookErr.statusCode = 500;
+    }
+    return next(bookErr);
+  }
+  if (bookData) {
+    console.log(bookData);
+    const error = new Error('This category has some books and cannot be deleted.');
+    error.status = 409;
+    return next(error);
+  }
+
   const category = Category.findByIdAndDelete(categoryId);
   const [categoryErr, categoryData] = await asyncWrapper(category);
   if (categoryErr) {
