@@ -2,12 +2,12 @@ const express = require('express');
 const authController = require('../controllers/auth');
 const rateLimit = require('../utils/rateLimiter');
 const router = express.Router();
-const validation = require('../middlewares/validation');
+const authValidation = require('../middlewares/validation/auth');
 
-router.post('/login', validation.validateLogin, rateLimit.loginLimiter, authController.login);
+router.post('/login', authValidation.validateLogin, rateLimit.loginLimiter, authController.login);
 router.post(
   '/signup',
-  validation.validateSignup,
+  authValidation.validateSignup,
   rateLimit.createAccountLimiter,
   authController.signup
 );
