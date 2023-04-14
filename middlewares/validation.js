@@ -38,7 +38,7 @@ const signupSchema = Joi.object({
       'string.min': 'Password must be at least {#limit} characters long',
       'any.invalid': 'Password is too common',
     }),
-  confirmPassword: Joi.string().valid(Joi.ref('password')).required().messages({
+  confirmPassword: Joi.string().valid(Joi.ref('password')).messages({
     'any.only': 'Passwords must match',
   }),
   image: Joi.binary()
@@ -153,7 +153,7 @@ const shelfSchema = Joi.object({
     .pattern(/^[0-9a-fA-F]{24}$/)
     .trim()
     .required(),
-  shelf: Joi.string().valid('WANT TO READ', 'CURRENTLY READING', 'READ').required(),
+  shelf: Joi.string().valid('WANT TO READ', 'CURRENTLY READING', 'READ', 'NONE').required(),
 });
 
 exports.validateSignup = (req, res, next) => {
