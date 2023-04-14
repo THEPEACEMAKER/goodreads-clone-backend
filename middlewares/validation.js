@@ -132,15 +132,7 @@ const bookSchema = Joi.object({
 });
 
 const ratingSchema = Joi.object({
-  rating: Joi.number().min(0).max(5).required(),
-  user: Joi.string()
-    .pattern(/^[0-9a-fA-F]{24}$/)
-    .trim()
-    .required(),
-  book: Joi.string()
-    .pattern(/^[0-9a-fA-F]{24}$/)
-    .trim()
-    .required(),
+  rate: Joi.number().min(0).max(5).required(),
 });
 
 const reviewSchema = Joi.object({
