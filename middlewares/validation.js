@@ -113,8 +113,7 @@ const bookSchema = Joi.object({
   description: Joi.string().min(10).required().trim(),
   image: Joi.binary()
     .encoding('base64')
-    .max(5 * 1024 * 1024)
-    .trim(),
+    .max(5 * 1024 * 1024),
   category: Joi.string()
     .pattern(/^[0-9a-fA-F]{24}$/)
     .trim()
@@ -123,7 +122,7 @@ const bookSchema = Joi.object({
     .pattern(/^[0-9a-fA-F]{24}$/)
     .trim()
     .required(),
-  avgRating: Joi.number().min(0).max(5).precision(1).trim(),
+  avgRating: Joi.number().min(0).max(5).precision(1),
   reviews: Joi.array().items(
     Joi.string()
       .pattern(/^[0-9a-fA-F]{24}$/)
@@ -133,7 +132,7 @@ const bookSchema = Joi.object({
 });
 
 const ratingSchema = Joi.object({
-  rating: Joi.number().min(0).max(5).trim().required(),
+  rating: Joi.number().min(0).max(5).required(),
   user: Joi.string()
     .pattern(/^[0-9a-fA-F]{24}$/)
     .trim()
