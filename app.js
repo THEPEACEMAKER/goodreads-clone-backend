@@ -3,7 +3,7 @@ const dotenv = require('dotenv').config();
 const cors = require('cors');
 const mongoose = require('mongoose');
 const multer = require('multer');
-const express = require("express");
+const helmet = require('helmet');
 const path = require('path');
 
 const notFound = require('./middlewares/notFound');
