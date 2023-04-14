@@ -67,7 +67,14 @@ exports.getUserBooks = async (req, res, next) => {
       .limit(perPage)
       .populate('book');
 
-    const books = bookShelves.map((bookShelf) => bookShelf.book);
+    const books = bookShelves.map((bookShelf) => {
+      const book = bookShelf.book;
+      const shelfName = bookShelf.shelfName;
+      return {
+        ...book._doc,
+        shelfName: shelfName,
+      };
+    });
     const totalBooks = await BookShelf.countDocuments(query);
 
     return res.status(200).json({ books, totalBooks });

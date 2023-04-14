@@ -3,6 +3,7 @@ const Author = require('../models/author');
 const Book = require('../models/book');
 const asyncWrapper = require('../utils/asyncWrapper');
 const clearImage = require('../utils/clearImage');
+const BookShelf = require('../models/shelf');
 
 exports.add = async (req, res, next) => {
   try {
@@ -174,12 +175,15 @@ exports.update = async (req, res, next) => {
 
 exports.get = async (req, res, next) => {
   const page = req.query.page || 1;
-  const perPage = req.query.perPage||10;
+  const perPage = req.query.perPage || 10;
+  const userId = req.user._id;
+
   try {
     const populateOptions = {
       category: { path: 'category', select: 'name' },
       author: { path: 'author', select: 'firstName lastName' },
     };
+
     const totalBooks = await Book.find().countDocuments();
     let books = await Book.find()
       .skip((page - 1) * perPage)
@@ -193,6 +197,17 @@ exports.get = async (req, res, next) => {
       return next(error);
     }
 
+    for (let i = 0; i < books.length; i++) {
+      const book = books[i];
+      const bookShelf = await BookShelf.findOne({ user: userId, book: book._id });
+      if (bookShelf) {
+        book.shelfName = bookShelf.shelfName;
+        console.log(book);
+      }
+    }
+
+    console.log('-----------------');
+    console.log(books[books.length - 1]);
     res.status(200).json({ message: 'Books found', books, totalBooks });
   } catch (err) {
     if (!err.statusCode) {

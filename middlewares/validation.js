@@ -114,11 +114,11 @@ const bookSchema = Joi.object({
   image: Joi.binary()
     .encoding('base64')
     .max(5 * 1024 * 1024),
-  category: Joi.string()
+  categoryId: Joi.string()
     .pattern(/^[0-9a-fA-F]{24}$/)
     .trim()
     .required(),
-  author: Joi.string()
+  authorId: Joi.string()
     .pattern(/^[0-9a-fA-F]{24}$/)
     .trim()
     .required(),
