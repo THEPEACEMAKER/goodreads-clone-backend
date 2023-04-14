@@ -3,11 +3,13 @@ const dotenv = require('dotenv').config();
 const cors = require('cors');
 const mongoose = require('mongoose');
 const multer = require('multer');
+const express = require("express");
 const path = require('path');
 
 const notFound = require('./middlewares/notFound');
 const errorHandler = require('./middlewares/errorHandler');
 const routes = require('./routes');
+
 
 const app = express();
 
@@ -33,6 +35,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+app.use(helmet());
 app.use(cors());
 app.use(multer({ storage: fileStorage, fileFilter }).single('image'));
 app.use(express.json());
