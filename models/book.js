@@ -39,6 +39,9 @@ const bookSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Review',
     },
+    shelfName: {
+      type: String,
+    },
   },
   {
     timestamps: true,

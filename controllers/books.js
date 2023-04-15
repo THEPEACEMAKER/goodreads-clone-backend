@@ -3,6 +3,8 @@ const Author = require('../models/author');
 const Book = require('../models/book');
 const asyncWrapper = require('../utils/asyncWrapper');
 const clearImage = require('../utils/clearImage');
+const BookShelf = require('../models/shelf');
+const mongoose = require('mongoose');
 
 exports.add = async (req, res, next) => {
   try {
@@ -15,19 +17,19 @@ exports.add = async (req, res, next) => {
 
     if (!category) {
       const error = new Error('Category not found');
-      error.statusCode = 404;
+      error.status = 404;
       throw error;
     }
 
     if (!author) {
       const error = new Error('Author not found');
-      error.statusCode = 404;
+      error.status = 404;
       throw error;
     }
 
     if (!req.file) {
       const error = new Error('No image file provided');
-      error.statusCode = 422;
+      error.status = 422;
       throw error;
     }
 
@@ -53,7 +55,7 @@ exports.add = async (req, res, next) => {
     res.status(201).json({ message: 'Book Created Successfully!', bookId: bookData._id });
   } catch (err) {
     if (!err.statusCode) {
-      err.statusCode = 500;
+      err.status = 500;
     }
     next(err);
   }
@@ -67,7 +69,7 @@ exports.delete = async (req, res, next) => {
 
     if (!book) {
       const error = new Error('Book not found');
-      error.statusCode = 404;
+      error.status = 404;
       throw error;
     }
 
@@ -76,7 +78,8 @@ exports.delete = async (req, res, next) => {
 
     // Delete the book
     const deletedBook = await Book.findByIdAndDelete(bookId);
-
+    //Delete from book shelf
+    await BookShelf.deleteMany({ book: bookId });
     // Decrease booksCount of author and category
     author.booksCount -= author.booksCount > 0 ? 1 : 0;
     category.booksCount -= category.booksCount > 0 ? 1 : 0;
@@ -89,7 +92,7 @@ exports.delete = async (req, res, next) => {
     res.status(200).json({ message: 'Book deleted successfully!', book: deletedBook });
   } catch (err) {
     if (!err.statusCode) {
-      err.statusCode = 500;
+      err.status = 500;
     }
     next(err);
   }
@@ -107,7 +110,7 @@ exports.update = async (req, res, next) => {
   }
   if (!imageUrl) {
     const error = new Error('No image file provided');
-    error.statusCode = 422;
+    error.status = 422;
     return next(error);
   }
 
@@ -120,19 +123,19 @@ exports.update = async (req, res, next) => {
 
     if (!book) {
       const error = new Error('Book not found');
-      error.statusCode = 404;
+      error.status = 404;
       throw error;
     }
 
     if (!category) {
       const error = new Error('Category not found');
-      error.statusCode = 404;
+      error.status = 404;
       throw error;
     }
 
     if (!author) {
       const error = new Error('Author not found');
-      error.statusCode = 404;
+      error.status = 404;
       throw error;
     }
 
@@ -166,7 +169,7 @@ exports.update = async (req, res, next) => {
     res.status(200).json({ message: 'Book Updated Successfully!', book: updatedBook });
   } catch (err) {
     if (!err.statusCode) {
-      err.statusCode = 500;
+      err.status = 500;
     }
     next(err);
   }
@@ -174,12 +177,15 @@ exports.update = async (req, res, next) => {
 
 exports.get = async (req, res, next) => {
   const page = req.query.page || 1;
-  const perPage = req.query.perPage||10;
+  const perPage = req.query.perPage || 10;
+  const userId = req.user._id;
+
   try {
     const populateOptions = {
       category: { path: 'category', select: 'name' },
       author: { path: 'author', select: 'firstName lastName' },
     };
+
     const totalBooks = await Book.find().countDocuments();
     let books = await Book.find()
       .skip((page - 1) * perPage)
@@ -189,14 +195,25 @@ exports.get = async (req, res, next) => {
 
     if (books.length === 0) {
       const error = new Error('Page not found');
-      error.statusCode = 404;
+      error.status = 404;
       return next(error);
     }
 
+    for (let i = 0; i < books.length; i++) {
+      const book = books[i];
+      const bookShelf = await BookShelf.findOne({ user: userId, book: book._id });
+      if (bookShelf) {
+        book.shelfName = bookShelf.shelfName;
+        console.log(book);
+      }
+    }
+
+    console.log('-----------------');
+    console.log(books[books.length - 1]);
     res.status(200).json({ message: 'Books found', books, totalBooks });
   } catch (err) {
     if (!err.statusCode) {
-      err.statusCode = 500;
+      err.status = 500;
     }
     return next(err);
   }
@@ -221,13 +238,13 @@ exports.getBookById = async (req, res, next) => {
   const [bookErr, bookData] = await asyncWrapper(book);
   if (bookErr) {
     if (!bookErr.statusCode) {
-      bookErr.statusCode = 500;
+      bookErr.status = 500;
     }
     return next(bookErr);
   }
   if (!bookData) {
     const error = new Error('Book not found');
-    error.statusCode = 404;
+    error.status = 404;
     return next(error);
   }
   res.status(200).json({ message: 'Book found successfully!', book: bookData });

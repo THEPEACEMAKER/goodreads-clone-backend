@@ -24,7 +24,7 @@ exports.add = async (req, res, next) => {
   const [authorErr, authorData] = await asyncWrapper(author.save());
   if (authorErr) {
     if (!authorErr.statusCode) {
-      authorErr.statusCode = 500;
+      authorErr.status = 500;
     }
     return next(authorErr);
   }
@@ -35,17 +35,32 @@ exports.delete = async (req, res, next) => {
   const {
     params: { authorId },
   } = req;
+
+  const authorBook = Book.findOne({ author: authorId });
+  const [bookErr, bookData] = await asyncWrapper(authorBook);
+  if (bookErr) {
+    if (!bookErr.statusCode) {
+      bookErr.status = 500;
+    }
+    return next(bookErr);
+  }
+  if (bookData) {
+    console.log(bookData);
+    const error = new Error('This author has some books and cannot be deleted.');
+    error.status = 409;
+    return next(error);
+  }
   const author = Author.findByIdAndDelete(authorId);
   const [authorErr, authorData] = await asyncWrapper(author);
   if (authorErr) {
     if (!authorErr.statusCode) {
-      authorErr.statusCode = 500;
+      authorErr.status = 500;
     }
     return next(authorErr);
   }
   if (!authorData) {
     const error = new Error('Author Not Found');
-    error.statusCode = 404;
+    error.status = 404;
     return next(error);
   }
   clearImage(authorData.imageUrl);
@@ -76,13 +91,13 @@ exports.update = async (req, res, next) => {
   const [authorErr, authorData] = await asyncWrapper(author);
   if (authorErr) {
     if (!authorErr.statusCode) {
-      authorErr.statusCode = 500;
+      authorErr.status = 500;
     }
     return next(authorErr);
   }
   if (!authorData) {
     const error = new Error('Author Not Found');
-    error.statusCode = 404;
+    error.status = 404;
     return next(error);
   }
   res.status(200).json({ message: 'Author Updated successfully!', author: authorData });
@@ -100,14 +115,14 @@ exports.get = async (req, res, next) => {
 
     if (authors.length === 0) {
       const error = new Error('Page not found');
-      error.statusCode = 404;
+      error.status = 404;
       return next(error);
     }
 
     res.status(200).json({ message: 'Authors found', authors, totalAuthors });
   } catch (err) {
     if (!err.statusCode) {
-      err.statusCode = 500;
+      err.status = 500;
     }
     return next(err);
   }
@@ -121,36 +136,38 @@ exports.getById = async (req, res, next) => {
   const [authorErr, authorData] = await asyncWrapper(author);
   if (authorErr) {
     if (!authorErr.statusCode) {
-      authorErr.statusCode = 500;
+      authorErr.status = 500;
     }
     return next(authorErr);
   }
   if (!authorData) {
     const error = new Error('Author not found');
-    error.statusCode = 404;
+    error.status = 404;
     return next(error);
   }
   res.status(200).json({ message: 'Author found successfully!', author: authorData });
 };
 
-
 exports.getAuthorBooks = async (req, res, next) => {
   const page = req.query.page || 1;
   const perPage = req.query.perPage || 6;
-  const {authorId}=req.params;
-  let total = await Book.find({author:authorId}).count();
-  let books = Book.find({author:authorId}).populate({
-    path: 'author',
-    select: 'firstName lastName -_id'
-  }).skip((page - 1) * perPage)
-  .limit(perPage);
-  const [booksErr,BooksData] = await asyncWrapper(books);
-  if(booksErr) {
-    if(!booksErr.statusCode){
-      booksErr.statusCode=500;
+  const { authorId } = req.params;
+  let total = await Book.find({ author: authorId }).count();
+  let books = Book.find({ author: authorId })
+    .populate({
+      path: 'author',
+      select: 'firstName lastName -_id',
+    })
+    .skip((page - 1) * perPage)
+    .limit(perPage);
+  const [booksErr, BooksData] = await asyncWrapper(books);
+  if (booksErr) {
+    if (!booksErr.statusCode) {
+      booksErr.status = 500;
     }
-    return next(booksErr)
+    return next(booksErr);
   }
-  res.status(200).json({message:"successfully found Books",authorBooks:BooksData,totalBooks:total});
-}
-
+  res
+    .status(200)
+    .json({ message: 'successfully found Books', authorBooks: BooksData, totalBooks: total });
+};

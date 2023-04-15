@@ -12,13 +12,13 @@ exports.login = async (req, res, next) => {
   const [userErr, userData] = await asyncWrapper(user);
   if (userErr) {
     if (!userErr.statusCode) {
-      userErr.statusCode = 403;
+      userErr.status = 403;
     }
     return next(userErr);
   }
   if (!userData) {
     const error = new Error('User not found');
-    error.statusCode = 404;
+    error.status = 404;
     return next(error);
   }
 
@@ -26,13 +26,13 @@ exports.login = async (req, res, next) => {
   const [isValidErr, isValidData] = await asyncWrapper(isValidPass);
   if (isValidErr) {
     if (!isValidErr.statusCode) {
-      isValidErr.statusCode = 500;
+      isValidErr.status = 500;
     }
     return next(isValidErr);
   }
   if (!isValidData) {
     const error = new Error('Invalid password');
-    error.statusCode = 401;
+    error.status = 401;
     return next(error);
   }
 
@@ -57,7 +57,7 @@ exports.signup = async (req, res, next) => {
 
   if (!req.file) {
     const error = new Error('No image file provided');
-    error.statusCode = 422;
+    error.status = 422;
     return next(error);
   }
   const imageUrl = `http://localhost:3000/images/${req.file.filename}`;
@@ -66,7 +66,7 @@ exports.signup = async (req, res, next) => {
   const [hashedPasswordErr, hashedPasswordData] = await asyncWrapper(hashedPassword);
   if (hashedPasswordErr) {
     if (!hashedPasswordErr.statusCode) {
-      hashedPasswordErr.statusCode = 500;
+      hashedPasswordErr.status = 500;
     }
     return next(hashedPasswordErr);
   }
@@ -84,14 +84,14 @@ exports.signup = async (req, res, next) => {
   const [newUserErr, newUserData] = await asyncWrapper(newUser);
   if (newUserErr) {
     if (!newUserErr.statusCode) {
-      newUserErr.statusCode = 500;
+      newUserErr.status = 500;
     }
     return next(newUserErr);
   }
 
   if (!newUserData) {
     const error = new Error('User was not created');
-    error.statusCode = 500;
+    error.status = 500;
     return next(error);
   }
   res.status(201).json({ message: 'User Created Successfully!', userId: newUserData._id });

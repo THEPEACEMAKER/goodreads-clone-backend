@@ -6,14 +6,14 @@ const Book = require('../models/book');
 
 exports.addRating = async (req, res, next) => {
   try {
-    const userId = req.userId;
+    const userId = req.user._id;
     const bookId = req.params.bookId;
     const { rate } = req.body;
 
     const book = await Book.findById(bookId);
     if (!book) {
       const error = new Error('Book not found');
-      error.statusCode = 404;
+      error.status = 404;
       throw error;
     }
 
