@@ -47,7 +47,7 @@ exports.add = async (req, res, next) => {
 };
 
 exports.update = async (req, res, next) => {
-    const userId = req.userId;
+    const userId = req.user._id;
     const {
       params: { reviewId },
       body: { title, content},
@@ -70,7 +70,7 @@ exports.update = async (req, res, next) => {
   };
 
 exports.delete = async (req, res, next) => {
-    const userId = req.userId;
+    const userId = req.user._id;
     const {
       params: { reviewId },
     } = req;
