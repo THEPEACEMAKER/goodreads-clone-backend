@@ -4,6 +4,7 @@ const Book = require('../models/book');
 const asyncWrapper = require('../utils/asyncWrapper');
 const clearImage = require('../utils/clearImage');
 const BookShelf = require('../models/shelf');
+const mongoose = require('mongoose');
 
 exports.add = async (req, res, next) => {
   try {
@@ -77,7 +78,8 @@ exports.delete = async (req, res, next) => {
 
     // Delete the book
     const deletedBook = await Book.findByIdAndDelete(bookId);
-
+    //Delete from book shelf
+    await BookShelf.deleteMany({ book: bookId });
     // Decrease booksCount of author and category
     author.booksCount -= author.booksCount > 0 ? 1 : 0;
     category.booksCount -= category.booksCount > 0 ? 1 : 0;
