@@ -8,7 +8,6 @@ exports.add = async (req, res, next) => {
     const userId = req.userId;
     const bookId = req.params.bookId;
     const { title, content} = req.body;
-    
     try {
         const book = await Book.findById(bookId);
         const user = await User.findById(userId);
@@ -45,21 +44,19 @@ exports.add = async (req, res, next) => {
         return next(reviewErr);
     }
     res.status(201).json({ message: 'Review Added Successfully!', review: reviewData });
-
-
-
 };
 
 
 
 
 exports.update = async (req, res, next) => {
+    const userId = req.userId;
     const {
-      query: { reviewId },
+      params: { reviewId },
       body: { title, content},
     } = req;
     let updates = {title, content};
-    const review = Review.findByIdAndUpdate(reviewId, updates);
+    const review = Review.findOneAndUpdate({_id:reviewId,user:userId}, updates);
     const [reviewErr, reviewData] = await asyncWrapper(review);
     if (reviewErr) {
       if (!reviewErr.statusCode) {
@@ -77,10 +74,11 @@ exports.update = async (req, res, next) => {
 
 
 exports.delete = async (req, res, next) => {
+    const userId = req.userId;
     const {
-      query: { reviewId },
+      params: { reviewId },
     } = req;
-    const review = Review.findByIdAndDelete(reviewId);
+    const review = Review.findOneAndDelete({_id:reviewId,user:userId});
     const [reviewErr, reviewData] = await asyncWrapper(review);
     if (reviewErr) {
       if (!reviewErr.statusCode) {
@@ -117,9 +115,12 @@ exports.getReviewsByBookId = async (req, res,next) => {
   const page = req.query.page || 1;
   const perPage = req.query.perPage || 6;
   const {bookId}=req.params;
-  let total = await Review.find({book:bookId}).count();
+  const total = await Review.find({book:bookId}).count();
+  const populateOptions = {
+    user: { path: 'user', select: 'firstName lastName'},
+  };
   let reviews = Review.find({book:bookId}).skip((page - 1) * perPage)
-  .limit(perPage);
+  .limit(perPage).populate(populateOptions.user);
   const [reviewsErr,reviewsData] = await asyncWrapper(reviews);
   if(reviewsErr) {
     if(!reviewsErr.statusCode){
