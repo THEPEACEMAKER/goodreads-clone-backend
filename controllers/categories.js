@@ -36,7 +36,6 @@ exports.delete = async (req, res, next) => {
     return next(bookErr);
   }
   if (bookData) {
-    console.log(bookData);
     const error = new Error('This category has some books and cannot be deleted.');
     error.status = 409;
     return next(error);
@@ -128,10 +127,12 @@ exports.getBooksByCategory = async (req, res, next) => {
   const {
     params: { categoryId },
   } = req;
+  const page = req.query.page || 1;
+  const perPage = req.query.perPage || 6;
   const userId = req.user ? req.user._id : undefined;
-  const books = Book.find({ category: categoryId }).populate('author');
+  const totalBooks = await Book.find({ category: categoryId }).count();
+  const books = Book.find({ category: categoryId }).skip((page-1)*perPage).limit(perPage).populate('author');
   const [bookErr, bookData] = await asyncWrapper(books);
-  console.log(bookData);
   if (bookErr) {
     if (!bookErr.statusCode) {
       bookErr.status = 500;
@@ -151,5 +152,5 @@ exports.getBooksByCategory = async (req, res, next) => {
     }
   }
 
-  res.status(200).json({ message: 'Category Books found successfully!', books: bookData });
+  res.status(200).json({ message: 'Category Books found successfully!', books: bookData , totalBooks: totalBooks });
 };

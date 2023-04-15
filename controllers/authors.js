@@ -46,7 +46,6 @@ exports.delete = async (req, res, next) => {
     return next(bookErr);
   }
   if (bookData) {
-    console.log(bookData);
     const error = new Error('This author has some books and cannot be deleted.');
     error.status = 409;
     return next(error);
@@ -76,7 +75,6 @@ exports.update = async (req, res, next) => {
   let updates = {};
   let imageUrl = req.body.image;
   if (req.file) {
-    console.log(req.file);
     imageUrl = req.file.filename;
   }
   if (!imageUrl) {

@@ -7,6 +7,7 @@ exports.add = async (req, res, next) => {
   const userId = req.user._id;
   const bookId = req.params.bookId;
   const { title, content } = req.body;
+  console.log(userId);
 
   try {
     const book = await Book.findById(bookId);
@@ -90,7 +91,7 @@ exports.delete = async (req, res, next) => {
     res.status(200).json({ message: 'Review Deleted successfully!', review: reviewData });
   };
 
-exports.getReviewsByBookId = async (req, res, next) => {
+exports.getReviewsByAuthorId = async (req, res, next) => {
   const page = req.query.page || 1;
   const perPage = req.query.perPage || 6;
   const { bookId } = req.params;
