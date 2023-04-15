@@ -1,53 +1,46 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const cloudinary = require('../utils/cloudinary');
 const User = require('../models/user');
-const asyncWrapper = require('../utils/asyncWrapper');
 
 exports.login = async (req, res, next) => {
   const {
     body: { email, password },
   } = req;
 
-  const user = User.findOne({ email });
-  const [userErr, userData] = await asyncWrapper(user);
-  if (userErr) {
-    if (!userErr.statusCode) {
-      userErr.status = 403;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      const error = new Error('User not found');
+      error.status = 404;
+      throw error;
     }
-    return next(userErr);
-  }
-  if (!userData) {
-    const error = new Error('User not found');
-    error.status = 404;
-    return next(error);
-  }
 
-  const isValidPass = userData.verifyPassword(password);
-  const [isValidErr, isValidData] = await asyncWrapper(isValidPass);
-  if (isValidErr) {
-    if (!isValidErr.statusCode) {
-      isValidErr.status = 500;
+    const isValidPass = await user.verifyPassword(password);
+    if (!isValidPass) {
+      const error = new Error('Invalid password');
+      error.status = 401;
+      throw error;
     }
-    return next(isValidErr);
-  }
-  if (!isValidData) {
-    const error = new Error('Invalid password');
-    error.status = 401;
-    return next(error);
-  }
 
-  const token = jwt.sign(
-    {
-      email: userData.email,
-      userId: userData._id,
-    },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: '15d',
+    const token = jwt.sign(
+      {
+        email: user.email,
+        userId: user._id,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '15d',
+      }
+    );
+
+    res.status(200).json({ message: 'Login Successfully!', token, user });
+  } catch (error) {
+    if (!error.status) {
+      error.status = 500;
     }
-  );
-
-  res.status(200).json({ message: 'Login Successfully!', token: token, user: userData });
+    next(error);
+  }
 };
 
 exports.signup = async (req, res, next) => {
@@ -60,39 +53,33 @@ exports.signup = async (req, res, next) => {
     error.status = 422;
     return next(error);
   }
-  const imageUrl = `http://localhost:3000/images/${req.file.filename}`;
 
-  const hashedPassword = bcrypt.hash(password, 12);
-  const [hashedPasswordErr, hashedPasswordData] = await asyncWrapper(hashedPassword);
-  if (hashedPasswordErr) {
-    if (!hashedPasswordErr.statusCode) {
-      hashedPasswordErr.status = 500;
+  try {
+    const image = await cloudinary.uploader.upload(req.file.path);
+    const imageUrl = image.secure_url;
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      imageUrl,
+      role,
+      password: hashedPassword,
+    });
+
+    const newUser = await user.save();
+    if (!newUser) {
+      const error = new Error('User was not created');
+      error.status = 500;
+      throw error;
     }
-    return next(hashedPasswordErr);
-  }
-
-  const user = new User({
-    firstName,
-    lastName,
-    email,
-    imageUrl,
-    role,
-    password: hashedPasswordData,
-  });
-
-  const newUser = user.save();
-  const [newUserErr, newUserData] = await asyncWrapper(newUser);
-  if (newUserErr) {
-    if (!newUserErr.statusCode) {
-      newUserErr.status = 500;
+    res.status(201).json({ message: 'User Created Successfully!', userId: newUser._id });
+  } catch (error) {
+    if (!error.status) {
+      error.status = 500;
     }
-    return next(newUserErr);
-  }
-
-  if (!newUserData) {
-    const error = new Error('User was not created');
-    error.status = 500;
     return next(error);
   }
-  res.status(201).json({ message: 'User Created Successfully!', userId: newUserData._id });
 };

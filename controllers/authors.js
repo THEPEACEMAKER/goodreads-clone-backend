@@ -8,11 +8,10 @@ exports.add = async (req, res, next) => {
   const {
     body: { firstName, lastName, dob },
   } = req;
+
   if (!req.file) {
     imageUrl = 'http://localhost:3000/images/default_author.jpg';
-    // const error = new Error('No image file provided');
-    // error.statusCode = 422;
-    // return next(error);
+
   } else imageUrl = `http://localhost:3000/images/${req.file.filename}`;
 
   const author = new Author({

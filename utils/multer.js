@@ -1,5 +1,7 @@
 const multer = require('multer');
 const path = require('path');
+const cloudinary = require('./cloudinary');
+const asyncWrapper = require('./asyncWrapper');
 
 const fileStorage = multer.diskStorage({
   destination(req, file, cb) {
@@ -23,4 +25,4 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-module.exports = multer({ storage: fileStorage, fileFilter }).single('image');
+module.exports = multer({ storage: fileStorage, fileFilter: fileFilter }).single('image');

@@ -4,7 +4,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const path = require('path');
-const imageHandler = require('./middlewares/imageHandler');
+const multer = require('./utils/multer');
 const notFound = require('./middlewares/notFound');
 const errorHandler = require('./middlewares/errorHandler');
 const routes = require('./routes');
@@ -13,7 +13,7 @@ const app = express();
 
 app.use(helmet());
 app.use(cors());
-app.use(imageHandler);
+app.use(multer);
 app.use(express.json());
 app.use(routes);
 app.use('/images', express.static(path.join(__dirname, 'images')));

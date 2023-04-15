@@ -4,15 +4,21 @@ const Book = require('../models/book');
 const asyncWrapper = require('../utils/asyncWrapper');
 const clearImage = require('../utils/clearImage');
 const BookShelf = require('../models/shelf');
-const mongoose = require('mongoose');
+const cloudinary = require('../utils/cloudinary');
 
 exports.add = async (req, res, next) => {
+  if (!req.file) {
+    const error = new Error('No image file provided');
+    error.status = 422;
+    throw error;
+  }
+
   try {
     const { name, description, categoryId, authorId } = req.body;
-
-    const [category, author] = await Promise.all([
+    const [category, author, image] = await Promise.all([
       Category.findById(categoryId),
       Author.findById(authorId),
+      cloudinary.uploader.upload(req.file.path),
     ]);
 
     if (!category) {
@@ -27,13 +33,7 @@ exports.add = async (req, res, next) => {
       throw error;
     }
 
-    if (!req.file) {
-      const error = new Error('No image file provided');
-      error.status = 422;
-      throw error;
-    }
-
-    const imageUrl = `http://localhost:3000/images/${req.file.filename}`;
+    imageUrl = image.secure_url;
 
     const book = new Book({
       name,
@@ -91,7 +91,7 @@ exports.delete = async (req, res, next) => {
 
     res.status(200).json({ message: 'Book deleted successfully!', book: deletedBook });
   } catch (err) {
-    if (!err.statusCode) {
+    if (!err.status) {
       err.status = 500;
     }
     next(err);
