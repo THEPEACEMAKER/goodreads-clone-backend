@@ -252,3 +252,21 @@ exports.getBookById = async (req, res, next) => {
   }
   res.status(200).json({ message: 'Book found successfully!', book: bookData });
 };
+
+exports.searchBooksByName = async (req, res, next) => {
+  const searchQuery = req.query.name;
+
+  try {
+    const books = await Book.find({ name: { $regex: searchQuery, $options: 'i' } })
+      .limit(6)
+      .populate({ path: 'category', select: 'name' })
+      .populate({ path: 'author', select: 'firstName lastName' });
+
+    res.status(200).json({ message: 'Books found', books });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.status = 500;
+    }
+    return next(err);
+  }
+};
