@@ -178,7 +178,7 @@ exports.update = async (req, res, next) => {
 exports.get = async (req, res, next) => {
   const page = req.query.page || 1;
   const perPage = req.query.perPage || 10;
-  const userId = req.user._id;
+  const userId = req.user ? req.user._id : undefined;
 
   try {
     const populateOptions = {
@@ -204,12 +204,9 @@ exports.get = async (req, res, next) => {
       const bookShelf = await BookShelf.findOne({ user: userId, book: book._id });
       if (bookShelf) {
         book.shelfName = bookShelf.shelfName;
-        console.log(book);
       }
     }
 
-    console.log('-----------------');
-    console.log(books[books.length - 1]);
     res.status(200).json({ message: 'Books found', books, totalBooks });
   } catch (err) {
     if (!err.statusCode) {
@@ -224,6 +221,7 @@ exports.getBookById = async (req, res, next) => {
     params: { bookId },
     query: { populate },
   } = req;
+  const userId = req.user ? req.user._id : undefined;
   const populateFields = populate ? populate.split(' ') : []; // Adel: for when we need to get the book with its reviews, will need some testing
   const populateOptions = {
     category: { path: 'category', select: '' },
@@ -246,6 +244,11 @@ exports.getBookById = async (req, res, next) => {
     const error = new Error('Book not found');
     error.status = 404;
     return next(error);
+  }
+
+  const bookShelf = await BookShelf.findOne({ user: userId, book: bookData._id });
+  if (bookShelf) {
+    bookData.shelfName = bookShelf.shelfName;
   }
   res.status(200).json({ message: 'Book found successfully!', book: bookData });
 };

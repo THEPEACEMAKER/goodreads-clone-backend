@@ -15,5 +15,5 @@ router.patch(
 );
 router.get('/', authorsController.get);
 router.get('/:authorId', authorsController.getById);
-router.get('/:authorId/books', authorsController.getAuthorBooks);
+router.get('/:authorId/books', isAuth, authorsController.getAuthorBooks);
 module.exports = router;
