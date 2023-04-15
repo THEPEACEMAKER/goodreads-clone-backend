@@ -11,14 +11,14 @@ exports.addToShelf = async (req, res, next) => {
     const user = await User.findById(userId);
     if (!user) {
       const error = new Error('User not found');
-      error.statusCode = 404;
+      error.status = 404;
       return next(error);
     }
 
     const book = await Book.findById(bookId);
     if (!book) {
       const error = new Error('Book not found');
-      error.statusCode = 404;
+      error.status = 404;
       return next(error);
     }
 
@@ -42,7 +42,7 @@ exports.addToShelf = async (req, res, next) => {
     }
   } catch (error) {
     if (!error.statusCode) {
-      error.statusCode = 500;
+      error.status = 500;
     }
     return next(error);
   }
@@ -80,7 +80,7 @@ exports.getUserBooks = async (req, res, next) => {
     return res.status(200).json({ books, totalBooks });
   } catch (err) {
     if (!err.statusCode) {
-      err.statusCode = 500;
+      err.status = 500;
     }
     return next(err);
   }

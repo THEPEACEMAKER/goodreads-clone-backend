@@ -17,19 +17,19 @@ exports.add = async (req, res, next) => {
 
     if (!category) {
       const error = new Error('Category not found');
-      error.statusCode = 404;
+      error.status = 404;
       throw error;
     }
 
     if (!author) {
       const error = new Error('Author not found');
-      error.statusCode = 404;
+      error.status = 404;
       throw error;
     }
 
     if (!req.file) {
       const error = new Error('No image file provided');
-      error.statusCode = 422;
+      error.status = 422;
       throw error;
     }
 
@@ -55,7 +55,7 @@ exports.add = async (req, res, next) => {
     res.status(201).json({ message: 'Book Created Successfully!', bookId: bookData._id });
   } catch (err) {
     if (!err.statusCode) {
-      err.statusCode = 500;
+      err.status = 500;
     }
     next(err);
   }
@@ -69,7 +69,7 @@ exports.delete = async (req, res, next) => {
 
     if (!book) {
       const error = new Error('Book not found');
-      error.statusCode = 404;
+      error.status = 404;
       throw error;
     }
 
@@ -92,7 +92,7 @@ exports.delete = async (req, res, next) => {
     res.status(200).json({ message: 'Book deleted successfully!', book: deletedBook });
   } catch (err) {
     if (!err.statusCode) {
-      err.statusCode = 500;
+      err.status = 500;
     }
     next(err);
   }
@@ -110,7 +110,7 @@ exports.update = async (req, res, next) => {
   }
   if (!imageUrl) {
     const error = new Error('No image file provided');
-    error.statusCode = 422;
+    error.status = 422;
     return next(error);
   }
 
@@ -123,19 +123,19 @@ exports.update = async (req, res, next) => {
 
     if (!book) {
       const error = new Error('Book not found');
-      error.statusCode = 404;
+      error.status = 404;
       throw error;
     }
 
     if (!category) {
       const error = new Error('Category not found');
-      error.statusCode = 404;
+      error.status = 404;
       throw error;
     }
 
     if (!author) {
       const error = new Error('Author not found');
-      error.statusCode = 404;
+      error.status = 404;
       throw error;
     }
 
@@ -169,7 +169,7 @@ exports.update = async (req, res, next) => {
     res.status(200).json({ message: 'Book Updated Successfully!', book: updatedBook });
   } catch (err) {
     if (!err.statusCode) {
-      err.statusCode = 500;
+      err.status = 500;
     }
     next(err);
   }
@@ -195,7 +195,7 @@ exports.get = async (req, res, next) => {
 
     if (books.length === 0) {
       const error = new Error('Page not found');
-      error.statusCode = 404;
+      error.status = 404;
       return next(error);
     }
 
@@ -213,7 +213,7 @@ exports.get = async (req, res, next) => {
     res.status(200).json({ message: 'Books found', books, totalBooks });
   } catch (err) {
     if (!err.statusCode) {
-      err.statusCode = 500;
+      err.status = 500;
     }
     return next(err);
   }
@@ -238,13 +238,13 @@ exports.getBookById = async (req, res, next) => {
   const [bookErr, bookData] = await asyncWrapper(book);
   if (bookErr) {
     if (!bookErr.statusCode) {
-      bookErr.statusCode = 500;
+      bookErr.status = 500;
     }
     return next(bookErr);
   }
   if (!bookData) {
     const error = new Error('Book not found');
-    error.statusCode = 404;
+    error.status = 404;
     return next(error);
   }
   res.status(200).json({ message: 'Book found successfully!', book: bookData });

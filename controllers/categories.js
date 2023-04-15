@@ -14,7 +14,7 @@ exports.add = async (req, res, next) => {
   const [categoryErr, categoryData] = await asyncWrapper(category.save());
   if (categoryErr) {
     if (!categoryErr.statusCode) {
-      categoryErr.statusCode = 500;
+      categoryErr.status = 500;
     }
     return next(categoryErr);
   }
@@ -30,7 +30,7 @@ exports.delete = async (req, res, next) => {
   const [bookErr, bookData] = await asyncWrapper(categoryBook);
   if (bookErr) {
     if (!bookErr.statusCode) {
-      bookErr.statusCode = 500;
+      bookErr.status = 500;
     }
     return next(bookErr);
   }
@@ -45,13 +45,13 @@ exports.delete = async (req, res, next) => {
   const [categoryErr, categoryData] = await asyncWrapper(category);
   if (categoryErr) {
     if (!categoryErr.statusCode) {
-      categoryErr.statusCode = 500;
+      categoryErr.status = 500;
     }
     return next(categoryErr);
   }
   if (!categoryData) {
     const error = new Error('Category Not Found');
-    error.statusCode = 404;
+    error.status = 404;
     return next(error);
   }
   res.status(200).json({ message: 'Category Deleted successfully!', category: categoryData });
@@ -66,13 +66,13 @@ exports.update = async (req, res, next) => {
   const [categoryErr, categoryData] = await asyncWrapper(category);
   if (categoryErr) {
     if (!categoryErr.statusCode) {
-      categoryErr.statusCode = 500;
+      categoryErr.status = 500;
     }
     return next(categoryErr);
   }
   if (!categoryData) {
     const error = new Error('Category Not Found');
-    error.statusCode = 404;
+    error.status = 404;
     return next(error);
   }
   res.status(200).json({ message: 'Category Updated successfully!', category: categoryData });
@@ -90,14 +90,14 @@ exports.get = async (req, res, next) => {
 
     if (categories.length === 0) {
       const error = new Error('Page not found');
-      error.statusCode = 404;
+      error.status = 404;
       return next(error);
     }
 
     res.status(200).json({ message: 'Categories found', categories, totalCategories });
   } catch (err) {
     if (!err.statusCode) {
-      err.statusCode = 500;
+      err.status = 500;
     }
     return next(err);
   }
@@ -111,13 +111,13 @@ exports.getById = async (req, res, next) => {
   const [categoryErr, categoryData] = await asyncWrapper(category);
   if (categoryErr) {
     if (!categoryErr.statusCode) {
-      categoryErr.statusCode = 500;
+      categoryErr.status = 500;
     }
     return next(categoryErr);
   }
   if (!categoryData) {
     const error = new Error('Category not found');
-    error.statusCode = 404;
+    error.status = 404;
     return next(error);
   }
   res.status(200).json({ message: 'Category found successfully!', category: categoryData });
@@ -132,13 +132,13 @@ exports.getBooksByCategory = async (req, res, next) => {
   console.log(bookData);
   if (bookErr) {
     if (!bookErr.statusCode) {
-      bookErr.statusCode = 500;
+      bookErr.status = 500;
     }
     return next(bookErr);
   }
   if (!bookData) {
     const error = new Error('Category not found');
-    error.statusCode = 404;
+    error.status = 404;
     return next(error);
   }
   res.status(200).json({ message: 'Category Books found successfully!', books: bookData });

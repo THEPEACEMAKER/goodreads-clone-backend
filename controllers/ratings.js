@@ -13,7 +13,7 @@ exports.addRating = async (req, res, next) => {
     const book = await Book.findById(bookId);
     if (!book) {
       const error = new Error('Book not found');
-      error.statusCode = 404;
+      error.status = 404;
       throw error;
     }
 

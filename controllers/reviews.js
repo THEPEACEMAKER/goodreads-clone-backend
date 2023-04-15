@@ -13,18 +13,18 @@ exports.add = async (req, res, next) => {
     const user = await User.findById(userId);
     if (!book) {
       const error = new Error('book not found');
-      error.statusCode = 404;
+      error.status = 404;
       return next(error);
     }
 
     if (!user) {
       const error = new Error('user not found');
-      error.statusCode = 404;
+      error.status = 404;
       return next(error);
     }
   } catch (err) {
     if (!err.statusCode) {
-      err.statusCode = 500;
+      err.status = 500;
       return next(err);
     }
   }
@@ -39,7 +39,7 @@ exports.add = async (req, res, next) => {
   const [reviewErr, reviewData] = await asyncWrapper(review.save());
   if (reviewErr) {
     if (!reviewErr.statusCode) {
-      reviewErr.statusCode = 500;
+      reviewErr.status = 500;
     }
     return next(reviewErr);
   }
@@ -56,13 +56,13 @@ exports.update = async (req, res, next) => {
   const [reviewErr, reviewData] = await asyncWrapper(review);
   if (reviewErr) {
     if (!reviewErr.statusCode) {
-      reviewErr.statusCode = 500;
+      reviewErr.status = 500;
     }
     return next(reviewErr);
   }
   if (!reviewData) {
     const error = new Error('Review Not Found');
-    error.statusCode = 404;
+    error.status = 404;
     return next(error);
   }
   res.status(200).json({ message: 'Review Updated successfully!', review: reviewData });
@@ -76,13 +76,13 @@ exports.delete = async (req, res, next) => {
   const [reviewErr, reviewData] = await asyncWrapper(review);
   if (reviewErr) {
     if (!reviewErr.statusCode) {
-      reviewErr.statusCode = 500;
+      reviewErr.status = 500;
     }
     return next(reviewErr);
   }
   if (!reviewData) {
     const error = new Error('Review Not Found');
-    error.statusCode = 404;
+    error.status = 404;
     return next(error);
   }
   res.status(200).json({ message: 'Review Deleted successfully!', review: reviewData });
@@ -99,7 +99,7 @@ exports.getReviewsByBookId = async (req, res, next) => {
   const [reviewsErr, reviewsData] = await asyncWrapper(reviews);
   if (reviewsErr) {
     if (!reviewsErr.statusCode) {
-      reviewsErr.statusCode = 500;
+      reviewsErr.status = 500;
     }
     return next(reviewsErr);
   }
@@ -123,7 +123,7 @@ exports.getReviewsByBookId = async (req, res, next) => {
   const [reviewsErr, reviewsData] = await asyncWrapper(reviews);
   if (reviewsErr) {
     if (!reviewsErr.statusCode) {
-      reviewsErr.statusCode = 500;
+      reviewsErr.status = 500;
     }
     return next(reviewsErr);
   }

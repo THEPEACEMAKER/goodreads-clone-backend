@@ -24,7 +24,7 @@ exports.add = async (req, res, next) => {
   const [authorErr, authorData] = await asyncWrapper(author.save());
   if (authorErr) {
     if (!authorErr.statusCode) {
-      authorErr.statusCode = 500;
+      authorErr.status = 500;
     }
     return next(authorErr);
   }
@@ -40,7 +40,7 @@ exports.delete = async (req, res, next) => {
   const [bookErr, bookData] = await asyncWrapper(authorBook);
   if (bookErr) {
     if (!bookErr.statusCode) {
-      bookErr.statusCode = 500;
+      bookErr.status = 500;
     }
     return next(bookErr);
   }
@@ -54,13 +54,13 @@ exports.delete = async (req, res, next) => {
   const [authorErr, authorData] = await asyncWrapper(author);
   if (authorErr) {
     if (!authorErr.statusCode) {
-      authorErr.statusCode = 500;
+      authorErr.status = 500;
     }
     return next(authorErr);
   }
   if (!authorData) {
     const error = new Error('Author Not Found');
-    error.statusCode = 404;
+    error.status = 404;
     return next(error);
   }
   clearImage(authorData.imageUrl);
@@ -91,13 +91,13 @@ exports.update = async (req, res, next) => {
   const [authorErr, authorData] = await asyncWrapper(author);
   if (authorErr) {
     if (!authorErr.statusCode) {
-      authorErr.statusCode = 500;
+      authorErr.status = 500;
     }
     return next(authorErr);
   }
   if (!authorData) {
     const error = new Error('Author Not Found');
-    error.statusCode = 404;
+    error.status = 404;
     return next(error);
   }
   res.status(200).json({ message: 'Author Updated successfully!', author: authorData });
@@ -115,14 +115,14 @@ exports.get = async (req, res, next) => {
 
     if (authors.length === 0) {
       const error = new Error('Page not found');
-      error.statusCode = 404;
+      error.status = 404;
       return next(error);
     }
 
     res.status(200).json({ message: 'Authors found', authors, totalAuthors });
   } catch (err) {
     if (!err.statusCode) {
-      err.statusCode = 500;
+      err.status = 500;
     }
     return next(err);
   }
@@ -136,13 +136,13 @@ exports.getById = async (req, res, next) => {
   const [authorErr, authorData] = await asyncWrapper(author);
   if (authorErr) {
     if (!authorErr.statusCode) {
-      authorErr.statusCode = 500;
+      authorErr.status = 500;
     }
     return next(authorErr);
   }
   if (!authorData) {
     const error = new Error('Author not found');
-    error.statusCode = 404;
+    error.status = 404;
     return next(error);
   }
   res.status(200).json({ message: 'Author found successfully!', author: authorData });
@@ -163,7 +163,7 @@ exports.getAuthorBooks = async (req, res, next) => {
   const [booksErr, BooksData] = await asyncWrapper(books);
   if (booksErr) {
     if (!booksErr.statusCode) {
-      booksErr.statusCode = 500;
+      booksErr.status = 500;
     }
     return next(booksErr);
   }
