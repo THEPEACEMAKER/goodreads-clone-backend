@@ -54,7 +54,7 @@ exports.add = async (req, res, next) => {
 
     res.status(201).json({ message: 'Book Created Successfully!', bookId: bookData._id });
   } catch (err) {
-    if (!err.statusCode) {
+    if (!err.status) {
       err.status = 500;
     }
     next(err);
@@ -210,7 +210,7 @@ exports.get = async (req, res, next) => {
 
     res.status(200).json({ message: 'Books found', books, totalBooks });
   } catch (err) {
-    if (!err.statusCode) {
+    if (!err.status) {
       err.status = 500;
     }
     return next(err);
@@ -236,7 +236,7 @@ exports.getBookById = async (req, res, next) => {
     .populate(populateOptions.category);
   const [bookErr, bookData] = await asyncWrapper(book);
   if (bookErr) {
-    if (!bookErr.statusCode) {
+    if (!bookErr.status) {
       bookErr.status = 500;
     }
     return next(bookErr);
@@ -265,7 +265,7 @@ exports.searchBooksByName = async (req, res, next) => {
 
     res.status(200).json({ message: 'Books found', books });
   } catch (err) {
-    if (!err.statusCode) {
+    if (!err.status) {
       err.status = 500;
     }
     return next(err);

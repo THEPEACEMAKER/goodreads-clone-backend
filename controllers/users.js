@@ -41,7 +41,7 @@ exports.addToShelf = async (req, res, next) => {
       return res.status(200).json({ message: 'Book added to shelf successfully' });
     }
   } catch (error) {
-    if (!error.statusCode) {
+    if (!error.status) {
       error.status = 500;
     }
     return next(error);
@@ -79,7 +79,7 @@ exports.getUserBooks = async (req, res, next) => {
 
     return res.status(200).json({ books, totalBooks });
   } catch (err) {
-    if (!err.statusCode) {
+    if (!err.status) {
       err.status = 500;
     }
     return next(err);

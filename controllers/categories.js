@@ -14,7 +14,7 @@ exports.add = async (req, res, next) => {
 
   const [categoryErr, categoryData] = await asyncWrapper(category.save());
   if (categoryErr) {
-    if (!categoryErr.statusCode) {
+    if (!categoryErr.status) {
       categoryErr.status = 500;
     }
     return next(categoryErr);
@@ -30,7 +30,7 @@ exports.delete = async (req, res, next) => {
   const categoryBook = Book.findOne({ category: categoryId });
   const [bookErr, bookData] = await asyncWrapper(categoryBook);
   if (bookErr) {
-    if (!bookErr.statusCode) {
+    if (!bookErr.status) {
       bookErr.status = 500;
     }
     return next(bookErr);
@@ -44,7 +44,7 @@ exports.delete = async (req, res, next) => {
   const category = Category.findByIdAndDelete(categoryId);
   const [categoryErr, categoryData] = await asyncWrapper(category);
   if (categoryErr) {
-    if (!categoryErr.statusCode) {
+    if (!categoryErr.status) {
       categoryErr.status = 500;
     }
     return next(categoryErr);
@@ -65,7 +65,7 @@ exports.update = async (req, res, next) => {
   const category = Category.findByIdAndUpdate(categoryId, { name });
   const [categoryErr, categoryData] = await asyncWrapper(category);
   if (categoryErr) {
-    if (!categoryErr.statusCode) {
+    if (!categoryErr.status) {
       categoryErr.status = 500;
     }
     return next(categoryErr);
@@ -96,7 +96,7 @@ exports.get = async (req, res, next) => {
 
     res.status(200).json({ message: 'Categories found', categories, totalCategories });
   } catch (err) {
-    if (!err.statusCode) {
+    if (!err.status) {
       err.status = 500;
     }
     return next(err);
@@ -110,7 +110,7 @@ exports.getById = async (req, res, next) => {
   const category = Category.findById(categoryId);
   const [categoryErr, categoryData] = await asyncWrapper(category);
   if (categoryErr) {
-    if (!categoryErr.statusCode) {
+    if (!categoryErr.status) {
       categoryErr.status = 500;
     }
     return next(categoryErr);
@@ -134,7 +134,7 @@ exports.getBooksByCategory = async (req, res, next) => {
   const books = Book.find({ category: categoryId }).skip((page-1)*perPage).limit(perPage).populate('author');
   const [bookErr, bookData] = await asyncWrapper(books);
   if (bookErr) {
-    if (!bookErr.statusCode) {
+    if (!bookErr.status) {
       bookErr.status = 500;
     }
     return next(bookErr);
