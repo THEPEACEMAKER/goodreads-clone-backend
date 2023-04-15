@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 const addCategorySchema = Joi.object({
   name: Joi.string()
-    .pattern(/^[a-zA-Z]+$/)
+    .pattern(/^[a-zA-Z\s\-]+$/)
     .min(3)
     .max(15)
     .required()
@@ -11,7 +11,7 @@ const addCategorySchema = Joi.object({
 
 const updateCategorySchema = Joi.object({
   name: Joi.string()
-    .pattern(/^[a-zA-Z]+$/)
+    .pattern(/^[a-zA-Z\s\-]+$/)
     .min(3)
     .max(15)
     .trim(),

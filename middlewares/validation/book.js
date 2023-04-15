@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 const addBookSchema = Joi.object({
   name: Joi.string()
-    .pattern(/^[a-zA-Z]+$/)
+    .pattern(/^[a-zA-Z0-9\s\-\'\,\.\?\!]+$/)
     .min(3)
     .max(100)
     .required()
@@ -31,7 +31,7 @@ const addBookSchema = Joi.object({
 
 const updateBookSchema = Joi.object({
   name: Joi.string()
-    .pattern(/^[a-zA-Z]+$/)
+    .pattern(/^[a-zA-Z0-9\s\-\'\,\.\?\!]+$/)
     .min(3)
     .max(100)
     .trim(),
