@@ -1,12 +1,10 @@
-const fs = require('fs');
-const path = require('path');
+const cloudinary = require('../utils/cloudinary');
 
-module.exports = (filePath) => {
-  // fs.unlink(filePath, (err) => {
-  //     console.log('after');
-  //     if (err) {
-  //         throw err;
-  //     }
-  //     console.log('after2');
-  // });
+module.exports = (imagePath) => {
+  cloudinary.uploader.destroy(imagePath, (err, result) => {
+    if (err) {
+      return console.log(err);
+    }
+    console.log(result);
+  });
 };

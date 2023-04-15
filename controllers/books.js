@@ -87,7 +87,7 @@ exports.delete = async (req, res, next) => {
     // Save updated author and category objects
     await Promise.all([author.save(), category.save()]);
 
-    clearImage(deletedBook.imageUrl);
+    clearImage(deletedBook.imageUrl.split('/').pop().split('.')[0]);
 
     res.status(200).json({ message: 'Book deleted successfully!', book: deletedBook });
   } catch (err) {
@@ -106,7 +106,8 @@ exports.update = async (req, res, next) => {
 
   let imageUrl = req.body.image;
   if (req.file) {
-    imageUrl = `http://localhost:3000/images/${req.file.filename}`;
+    cloudinary.uploader.upload(req.file.path);
+    imageUrl = image.secure_url;
   }
   if (!imageUrl) {
     const error = new Error('No image file provided');
@@ -168,7 +169,7 @@ exports.update = async (req, res, next) => {
 
     res.status(200).json({ message: 'Book Updated Successfully!', book: updatedBook });
   } catch (err) {
-    if (!err.statusCode) {
+    if (!err.status) {
       err.status = 500;
     }
     next(err);

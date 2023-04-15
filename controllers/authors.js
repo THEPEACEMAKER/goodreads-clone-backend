@@ -3,67 +3,64 @@ const Book = require('../models/book');
 const asyncWrapper = require('../utils/asyncWrapper');
 const clearImage = require('../utils/clearImage');
 const BookShelf = require('../models/shelf');
+const cloudinary = require('../utils/cloudinary');
 
 exports.add = async (req, res, next) => {
   const {
     body: { firstName, lastName, dob },
   } = req;
 
-  if (!req.file) {
-    imageUrl = 'http://localhost:3000/images/default_author.jpg';
+  try {
+    if (!req.file) {
+      imageUrl = 'http://localhost:3000/images/default_author.jpg';
+    } else {
+      const image = await cloudinary.uploader.upload(req.file.path);
+      imageUrl = image.secure_url;
+      const author = new Author({
+        firstName,
+        lastName,
+        dob,
+        imageUrl,
+      });
 
-  } else imageUrl = `http://localhost:3000/images/${req.file.filename}`;
-
-  const author = new Author({
-    firstName,
-    lastName,
-    dob,
-    imageUrl,
-  });
-
-  const [authorErr, authorData] = await asyncWrapper(author.save());
-  if (authorErr) {
-    if (!authorErr.statusCode) {
-      authorErr.status = 500;
+      await author.save();
+      res.status(201).json({ message: 'Author Created Successfully!', authorId: author._id });
     }
-    return next(authorErr);
+  } catch (error) {
+    if (!error.status) {
+      error.status = 500;
+    }
+    next(error);
   }
-  res.status(201).json({ message: 'Author Created Successfully!', authorId: authorData._id });
 };
 
 exports.delete = async (req, res, next) => {
   const {
     params: { authorId },
   } = req;
+  try {
+    const authorBook = await Book.findOne({ author: authorId });
+    if (authorBook) {
+      const error = new Error('This author has some books and cannot be deleted.');
+      error.status = 409;
+      throw error;
+    }
 
-  const authorBook = Book.findOne({ author: authorId });
-  const [bookErr, bookData] = await asyncWrapper(authorBook);
-  if (bookErr) {
-    if (!bookErr.statusCode) {
-      bookErr.status = 500;
+    const author = await Author.findByIdAndDelete(authorId);
+
+    if (!author) {
+      const error = new Error('Author Not Found');
+      error.status = 404;
+      throw error;
     }
-    return next(bookErr);
-  }
-  if (bookData) {
-    const error = new Error('This author has some books and cannot be deleted.');
-    error.status = 409;
-    return next(error);
-  }
-  const author = Author.findByIdAndDelete(authorId);
-  const [authorErr, authorData] = await asyncWrapper(author);
-  if (authorErr) {
-    if (!authorErr.statusCode) {
-      authorErr.status = 500;
+    clearImage(author.imageUrl.split("/").pop().split(".")[0]);
+    res.status(200).json({ message: 'Author Deleted successfully!', author });
+  } catch (error) {
+    if (!error.status) {
+      error.status = 500;
     }
-    return next(authorErr);
+    next(error);
   }
-  if (!authorData) {
-    const error = new Error('Author Not Found');
-    error.status = 404;
-    return next(error);
-  }
-  clearImage(authorData.imageUrl);
-  res.status(200).json({ message: 'Author Deleted successfully!', author: authorData });
 };
 
 exports.update = async (req, res, next) => {
@@ -73,32 +70,31 @@ exports.update = async (req, res, next) => {
   } = req;
   let updates = {};
   let imageUrl = req.body.image;
-  if (req.file) {
-    imageUrl = req.file.filename;
-  }
-  if (!imageUrl) {
-    updates = { firstName, lastName, dob };
-    // const error = new Error('No image file provided');
-    // error.statusCode = 422;
-    // return next(error);
-  } else {
-    updates = { firstName, lastName, dob, imageUrl };
-  }
 
-  const author = Author.findByIdAndUpdate(authorId, updates);
-  const [authorErr, authorData] = await asyncWrapper(author);
-  if (authorErr) {
-    if (!authorErr.statusCode) {
-      authorErr.status = 500;
+  try {
+    if (req.file) {
+      const image = await cloudinary.uploader.upload(req.file.path);
+      imageUrl = image.secure_url;
     }
-    return next(authorErr);
+    if (!imageUrl) {
+      updates = { firstName, lastName, dob };
+    } else {
+      updates = { firstName, lastName, dob, imageUrl };
+    }
+
+    const author = await Author.findByIdAndUpdate(authorId, updates);
+    if (!author) {
+      const error = new Error('Author Not Found');
+      error.status = 404;
+      throw error;
+    }
+    res.status(200).json({ message: 'Author Updated successfully!', author: author });
+  } catch (error) {
+    if (!error.status) {
+      error.status = 500;
+    }
+    next(error);
   }
-  if (!authorData) {
-    const error = new Error('Author Not Found');
-    error.status = 404;
-    return next(error);
-  }
-  res.status(200).json({ message: 'Author Updated successfully!', author: authorData });
 };
 
 exports.get = async (req, res, next) => {
@@ -114,15 +110,15 @@ exports.get = async (req, res, next) => {
     if (authors.length === 0) {
       const error = new Error('Page not found');
       error.status = 404;
-      return next(error);
+      throw error;
     }
 
     res.status(200).json({ message: 'Authors found', authors, totalAuthors });
-  } catch (err) {
-    if (!err.statusCode) {
-      err.status = 500;
+  } catch (error) {
+    if (!error.status) {
+      error.status = 500;
     }
-    return next(err);
+    next(error);
   }
 };
 
@@ -130,20 +126,21 @@ exports.getById = async (req, res, next) => {
   const {
     params: { authorId },
   } = req;
-  const author = Author.findById(authorId);
-  const [authorErr, authorData] = await asyncWrapper(author);
-  if (authorErr) {
-    if (!authorErr.statusCode) {
-      authorErr.status = 500;
+
+  try {
+    const author = await Author.findById(authorId);
+    if (!author) {
+      const error = new Error('Author not found');
+      error.status = 404;
+      throw error;
     }
-    return next(authorErr);
+    res.status(200).json({ message: 'Author found successfully!', author: author });
+  } catch (error) {
+    if (!err.status) {
+      err.status = 500;
+    }
+    next(err);
   }
-  if (!authorData) {
-    const error = new Error('Author not found');
-    error.status = 404;
-    return next(error);
-  }
-  res.status(200).json({ message: 'Author found successfully!', author: authorData });
 };
 
 exports.getAuthorBooks = async (req, res, next) => {
@@ -151,31 +148,29 @@ exports.getAuthorBooks = async (req, res, next) => {
   const perPage = req.query.perPage || 6;
   const { authorId } = req.params;
   const userId = req.user ? req.user._id : undefined;
-  let total = await Book.find({ author: authorId }).count();
-  let books = Book.find({ author: authorId })
-    .populate({
-      path: 'author',
-      select: 'firstName lastName -_id',
-    })
-    .skip((page - 1) * perPage)
-    .limit(perPage);
-  const [booksErr, BooksData] = await asyncWrapper(books);
-  if (booksErr) {
-    if (!booksErr.statusCode) {
-      booksErr.status = 500;
+  try {
+    const total = await Book.find({ author: authorId }).count();
+    const books = await Book.find({ author: authorId })
+      .populate({
+        path: 'author',
+        select: 'firstName lastName -_id',
+      })
+      .skip((page - 1) * perPage)
+      .limit(perPage);
+    for (let i = 0; i < books.length; i++) {
+      const book = books[i];
+      const bookShelf = await BookShelf.findOne({ user: userId, book: book._id });
+      if (bookShelf) {
+        book.shelfName = bookShelf.shelfName;
+      }
     }
-    return next(booksErr);
-  }
-
-  for (let i = 0; i < BooksData.length; i++) {
-    const book = BooksData[i];
-    const bookShelf = await BookShelf.findOne({ user: userId, book: book._id });
-    if (bookShelf) {
-      book.shelfName = bookShelf.shelfName;
+    res
+      .status(200)
+      .json({ message: 'successfully found Books', authorBooks: books, totalBooks: total });
+  } catch (error) {
+    if (!err.status) {
+      err.status = 500;
     }
+    next(err);
   }
-
-  res
-    .status(200)
-    .json({ message: 'successfully found Books', authorBooks: BooksData, totalBooks: total });
 };
