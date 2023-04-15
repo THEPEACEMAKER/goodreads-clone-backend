@@ -1,6 +1,7 @@
 const asyncWrapper = require('../utils/asyncWrapper');
 const Category = require('../models/category');
 const Book = require('../models/book');
+const BookShelf = require('../models/shelf');
 
 exports.add = async (req, res, next) => {
   const {
@@ -127,6 +128,7 @@ exports.getBooksByCategory = async (req, res, next) => {
   const {
     params: { categoryId },
   } = req;
+  const userId = req.user ? req.user._id : undefined;
   const books = Book.find({ category: categoryId }).populate('author');
   const [bookErr, bookData] = await asyncWrapper(books);
   console.log(bookData);
@@ -141,5 +143,13 @@ exports.getBooksByCategory = async (req, res, next) => {
     error.status = 404;
     return next(error);
   }
+
+  for (let i = 0; i < bookData.length; i++) {
+    const bookShelf = await BookShelf.findOne({ user: userId, book: bookData[i]._id });
+    if (bookShelf) {
+      bookData[i].shelfName = bookShelf.shelfName;
+    }
+  }
+
   res.status(200).json({ message: 'Category Books found successfully!', books: bookData });
 };

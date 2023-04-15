@@ -9,5 +9,6 @@ router.post('/', isAuth, bookValidation.validateAddBookData, booksController.add
 router.delete('/:bookId', isAuth, booksController.delete);
 router.patch('/:bookId', bookValidation.validateUpdateBookData, isAuth, booksController.update);
 router.get('/', isAuth, booksController.get);
+router.get('/search', booksController.searchBooksByName);
 router.get('/:bookId', isAuth, booksController.getBookById);
 module.exports = router;

@@ -2,6 +2,7 @@ const Author = require('../models/author');
 const Book = require('../models/book');
 const asyncWrapper = require('../utils/asyncWrapper');
 const clearImage = require('../utils/clearImage');
+const BookShelf = require('../models/shelf');
 
 exports.add = async (req, res, next) => {
   const {
@@ -152,6 +153,7 @@ exports.getAuthorBooks = async (req, res, next) => {
   const page = req.query.page || 1;
   const perPage = req.query.perPage || 6;
   const { authorId } = req.params;
+  const userId = req.user ? req.user._id : undefined;
   let total = await Book.find({ author: authorId }).count();
   let books = Book.find({ author: authorId })
     .populate({
@@ -167,6 +169,15 @@ exports.getAuthorBooks = async (req, res, next) => {
     }
     return next(booksErr);
   }
+
+  for (let i = 0; i < BooksData.length; i++) {
+    const book = BooksData[i];
+    const bookShelf = await BookShelf.findOne({ user: userId, book: book._id });
+    if (bookShelf) {
+      book.shelfName = bookShelf.shelfName;
+    }
+  }
+
   res
     .status(200)
     .json({ message: 'successfully found Books', authorBooks: BooksData, totalBooks: total });

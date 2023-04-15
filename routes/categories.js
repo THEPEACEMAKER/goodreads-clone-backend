@@ -14,6 +14,6 @@ router.patch(
   categoriesController.update
 );
 router.get('/', categoriesController.get);
-router.get('/:categoryId/books', categoriesController.getBooksByCategory);
+router.get('/:categoryId/books', isAuth, categoriesController.getBooksByCategory);
 router.get('/:categoryId', categoriesController.getById);
 module.exports = router;
