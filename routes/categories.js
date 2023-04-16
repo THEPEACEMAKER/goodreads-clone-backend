@@ -1,15 +1,23 @@
 const express = require('express');
 const categoriesController = require('../controllers/categories');
 const isAuth = require('../middlewares/isAuth');
+const isAdmin = require('../middlewares/isAdmin');
 const categoryValidation = require('../middlewares/validation/category');
 
 const router = express.Router();
 
-router.post('/', isAuth, categoryValidation.validateAddCategoryData, categoriesController.add);
-router.delete('/:categoryId', isAuth, categoriesController.delete);
+router.post(
+  '/',
+  isAuth,
+  isAdmin,
+  categoryValidation.validateAddCategoryData,
+  categoriesController.add
+);
+router.delete('/:categoryId', isAuth, isAdmin, categoriesController.delete);
 router.patch(
   '/:categoryId',
   isAuth,
+  isAdmin,
   categoryValidation.validateUpdateCategoryData,
   categoriesController.update
 );

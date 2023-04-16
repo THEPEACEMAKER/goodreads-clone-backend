@@ -1,16 +1,18 @@
 const express = require('express');
 const authorsController = require('../controllers/authors');
 const isAuth = require('../middlewares/isAuth');
+const isAdmin = require('../middlewares/isAdmin');
 const authorValidation = require('../middlewares/validation/author');
 
 const router = express.Router();
 
-router.post('/', isAuth, authorValidation.validateAddAuthorData, authorsController.add);
-router.delete('/:authorId', isAuth, authorsController.delete);
+router.post('/', isAuth, isAdmin, authorValidation.validateAddAuthorData, authorsController.add);
+router.delete('/:authorId', isAuth, isAdmin, authorsController.delete);
 router.patch(
   '/:authorId',
   authorValidation.validateUpdateAuthorData,
   isAuth,
+  isAdmin,
   authorsController.update
 );
 router.get('/', authorsController.get);
