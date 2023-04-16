@@ -69,7 +69,8 @@ exports.update = async (req, res, next) => {
     body: { firstName, lastName, dob },
   } = req;
   let updates = {};
-  
+  let imageUrl = req.body.image;
+
   try {
     if (req.file) {
       const image = await cloudinary.uploader.upload(req.file.path);
