@@ -35,18 +35,6 @@ const userSchema = new Schema(
       enum: ['USER', 'ADMIN'],
       default: 'USER',
     },
-    books: [
-      {
-        book: {
-          type: Schema.Types.ObjectId,
-          ref: 'Book',
-        },
-        shelf: {
-          type: String,
-          enum: ['WANT TO READ', 'CURRENTLY READING', 'READ'],
-        },
-      },
-    ],
   },
   {
     timestamps: true,

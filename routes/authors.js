@@ -16,6 +16,7 @@ router.patch(
   authorsController.update
 );
 router.get('/', authorsController.get);
+router.get('/popular', authorsController.getPopularAuthors);
 router.get('/:authorId', authorsController.getById);
 router.get('/:authorId/books', isAuth, authorsController.getAuthorBooks);
 module.exports = router;

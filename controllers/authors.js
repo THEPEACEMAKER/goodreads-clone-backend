@@ -53,7 +53,7 @@ exports.delete = async (req, res, next) => {
       error.status = 404;
       throw error;
     }
-    clearImage(author.imageUrl.split("/").pop().split(".")[0]);
+    clearImage(author.imageUrl.split('/').pop().split('.')[0]);
     res.status(200).json({ message: 'Author Deleted successfully!', author });
   } catch (error) {
     if (!error.status) {
@@ -172,5 +172,18 @@ exports.getAuthorBooks = async (req, res, next) => {
       err.status = 500;
     }
     next(err);
+  }
+};
+
+exports.getPopularAuthors = async (req, res, next) => {
+  try {
+    const authors = await Author.find().sort({ ratingsCount: 'desc', booksCount: 'desc' }).limit(4);
+
+    res.status(200).json({ message: 'Popular authors found', authors });
+  } catch (err) {
+    if (!err.status) {
+      err.status = 500;
+    }
+    return next(err);
   }
 };
