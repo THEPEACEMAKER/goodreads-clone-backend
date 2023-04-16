@@ -17,5 +17,6 @@ router.patch(
 );
 router.get('/', isAuth, booksController.get);
 router.get('/search', booksController.searchBooksByName);
+router.get('/popular', booksController.getPopularBooks);
 router.get('/:bookId', isAuth, booksController.getBookById);
 module.exports = router;

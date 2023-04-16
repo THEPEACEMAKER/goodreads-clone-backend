@@ -271,3 +271,25 @@ exports.searchBooksByName = async (req, res, next) => {
     return next(err);
   }
 };
+
+exports.getPopularBooks = async (req, res, next) => {
+  try {
+    const populateOptions = {
+      category: { path: 'category', select: 'name' },
+      author: { path: 'author', select: 'firstName lastName' },
+    };
+
+    const books = await Book.find()
+      .sort({ avgRating: 'desc', ratingsCount: 'desc' })
+      .limit(5)
+      .populate(populateOptions.category)
+      .populate(populateOptions.author);
+
+    res.status(200).json({ message: 'Popular books found', books });
+  } catch (err) {
+    if (!err.status) {
+      err.status = 500;
+    }
+    return next(err);
+  }
+};
