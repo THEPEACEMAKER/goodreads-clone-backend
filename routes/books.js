@@ -3,6 +3,7 @@ const booksController = require('../controllers/books');
 const isAuth = require('../middlewares/isAuth');
 const isAdmin = require('../middlewares/isAdmin');
 const bookValidation = require('../middlewares/validation/book');
+const isLoggedIn = require('../middlewares/isLoggedIn');
 
 const router = express.Router();
 
@@ -15,8 +16,8 @@ router.patch(
   isAdmin,
   booksController.update
 );
-router.get('/', isAuth, booksController.get);
+router.get('/', isLoggedIn, booksController.get);
 router.get('/search', booksController.searchBooksByName);
-router.get('/popular', booksController.getPopularBooks);
-router.get('/:bookId', isAuth, booksController.getBookById);
+router.get('/popular', isLoggedIn, booksController.getPopularBooks);
+router.get('/:bookId', isLoggedIn, booksController.getBookById);
 module.exports = router;

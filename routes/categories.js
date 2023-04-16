@@ -3,6 +3,7 @@ const categoriesController = require('../controllers/categories');
 const isAuth = require('../middlewares/isAuth');
 const isAdmin = require('../middlewares/isAdmin');
 const categoryValidation = require('../middlewares/validation/category');
+const isLoggedIn = require('../middlewares/isLoggedIn');
 
 const router = express.Router();
 
@@ -22,6 +23,6 @@ router.patch(
   categoriesController.update
 );
 router.get('/', categoriesController.get);
-router.get('/:categoryId/books', isAuth, categoriesController.getBooksByCategory);
+router.get('/:categoryId/books', isLoggedIn, categoriesController.getBooksByCategory);
 router.get('/:categoryId', categoriesController.getById);
 module.exports = router;

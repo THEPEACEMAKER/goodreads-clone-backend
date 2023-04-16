@@ -3,21 +3,20 @@ const asyncWrapper = require('../utils/asyncWrapper');
 const User = require('../models/user');
 
 module.exports = async (req, res, next) => {
-  console.log('Auth');
+  console.log('logg');
   const { JWT_SECRET } = process.env;
   const authHeader = req.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    const error = new Error('Invalid authorization header');
-    error.status = 401;
-    return next(error);
+    // user is not signed in
+    return next();
   }
   const token = authHeader.split(' ')[1];
   let payload;
   try {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    err.statusCode = 401;
-    throw err;
+    // token is invalid or expired, user is not signed in
+    return next();
   }
 
   const user = User.findOne({ _id: payload.userId });
@@ -29,9 +28,8 @@ module.exports = async (req, res, next) => {
     }
   }
   if (!userData) {
-    const error = new Error('Unauthenticated');
-    error.status = 401;
-    return next(error);
+    // user is not signed in
+    return next();
   }
   req.user = userData;
   next();
