@@ -12,7 +12,7 @@ exports.add = async (req, res, next) => {
 
   try {
     if (!req.file) {
-      imageUrl = 'http://localhost:3000/images/default_author.jpg';
+      imageUrl = 'https://res.cloudinary.com/ddk98mjzn/image/upload/v1681623931/933-9332131_profile-picture-default-png_demf1c.jpg';
     } else {
       const image = await cloudinary.uploader.upload(req.file.path);
       imageUrl = image.secure_url;
