@@ -106,7 +106,7 @@ exports.update = async (req, res, next) => {
 
   let imageUrl = req.body.image;
   if (req.file) {
-    cloudinary.uploader.upload(req.file.path);
+    const image = cloudinary.uploader.upload(req.file.path);
     imageUrl = image.secure_url;
   }
   if (!imageUrl) {

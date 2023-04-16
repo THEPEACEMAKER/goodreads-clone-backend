@@ -1,10 +1,9 @@
 const cloudinary = require('../utils/cloudinary');
 
 module.exports = (imagePath) => {
-  cloudinary.uploader.destroy(imagePath, (err, result) => {
+  cloudinary.uploader.destroy(imagePath, (err) => {
     if (err) {
-      return console.log(err);
+      throw err;
     }
-    console.log(result);
   });
 };

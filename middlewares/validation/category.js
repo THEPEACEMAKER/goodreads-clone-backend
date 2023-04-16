@@ -4,7 +4,7 @@ const addCategorySchema = Joi.object({
   name: Joi.string()
     .pattern(/^[a-zA-Z\s\-]+$/)
     .min(3)
-    .max(15)
+    .max(20)
     .required()
     .trim(),
 });
@@ -13,7 +13,7 @@ const updateCategorySchema = Joi.object({
   name: Joi.string()
     .pattern(/^[a-zA-Z\s\-]+$/)
     .min(3)
-    .max(15)
+    .max(20)
     .trim(),
 });
 

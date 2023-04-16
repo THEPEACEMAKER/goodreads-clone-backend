@@ -2,13 +2,13 @@ const Joi = require('joi');
 
 const addAuthorSchema = Joi.object({
   firstName: Joi.string()
-    .pattern(/^[a-zA-Z]+$/)
+    .pattern(/^[a-zA-Z\.]+$/)
     .min(3)
     .max(15)
     .required()
     .trim(),
   lastName: Joi.string()
-    .pattern(/^[a-zA-Z]+$/)
+    .pattern(/^[a-zA-Z\.]+$/)
     .min(3)
     .max(15)
     .required()

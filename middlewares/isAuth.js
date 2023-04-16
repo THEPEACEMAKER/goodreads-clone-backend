@@ -3,7 +3,6 @@ const asyncWrapper = require('../utils/asyncWrapper');
 const User = require('../models/user');
 
 module.exports = async (req, res, next) => {
-  console.log('Auth');
   const { JWT_SECRET } = process.env;
   const authHeader = req.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
