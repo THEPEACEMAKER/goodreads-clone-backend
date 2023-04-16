@@ -10,7 +10,7 @@ exports.add = async (req, res, next) => {
   if (!req.file) {
     const error = new Error('No image file provided');
     error.status = 422;
-    throw error;
+    return res.status(error.status).json({ message: error.message });
   }
 
   try {
@@ -24,13 +24,13 @@ exports.add = async (req, res, next) => {
     if (!category) {
       const error = new Error('Category not found');
       error.status = 404;
-      throw error;
+      return res.status(error.status).json({ message: error.message });
     }
 
     if (!author) {
       const error = new Error('Author not found');
       error.status = 404;
-      throw error;
+      return res.status(error.status).json({ message: error.message });
     }
 
     imageUrl = image.secure_url;
@@ -104,16 +104,14 @@ exports.update = async (req, res, next) => {
     params: { bookId },
   } = req;
 
-  let imageUrl = req.body.image;
-  if (req.file) {
-    const image = cloudinary.uploader.upload(req.file.path);
-    imageUrl = image.secure_url;
-  }
-  if (!imageUrl) {
+  if (!req.file) {
     const error = new Error('No image file provided');
     error.status = 422;
-    return next(error);
+    return res.status(error.status).json({ message: error.message });
   }
+
+  const image = await cloudinary.uploader.upload(req.file.path);
+  imageUrl = image.secure_url;
 
   try {
     const [book, author, category] = await Promise.all([
@@ -125,19 +123,19 @@ exports.update = async (req, res, next) => {
     if (!book) {
       const error = new Error('Book not found');
       error.status = 404;
-      throw error;
+      return res.status(error.status).json({ message: error.message });
     }
 
     if (!category) {
       const error = new Error('Category not found');
       error.status = 404;
-      throw error;
+      return res.status(error.status).json({ message: error.message });
     }
 
     if (!author) {
       const error = new Error('Author not found');
       error.status = 404;
-      throw error;
+      return res.status(error.status).json({ message: error.message });
     }
 
     const shouldUpdateCategoryCount = book.category._id.toString() !== categoryId;
